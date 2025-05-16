@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+#
+# Assume JSON on input and prettify. jq defaults to 2-space indent.
+# Suppress coloring to be on the safe side.
+
+cat | jq -M

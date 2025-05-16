@@ -1,0 +1,8 @@
+#! /usr/bin/env bash
+
+# Provide common scripting content to all tests:
+cp $FILES/*.zeek .
+
+# Establish a symlink that makes the package available under the same name it
+# would have once installed via zkg:
+ln -s $PACKAGE logschema

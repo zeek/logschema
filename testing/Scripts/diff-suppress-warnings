@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+#
+# Remove warnings unrelated to this package:
+# - In 7.0.x usage warnings in base/utils/strings.zeek are irrelevant
+grep -v -E '^warning in .+/base/utils/strings.zeek,.+non-exported function'
+
+exit 0
