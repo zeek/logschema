@@ -1,12 +1,14 @@
 [package]
 script_dir = scripts
 test_command = cd testing && btest -c btest.cfg
-summary = TODO: A summary of logschema in one line
-description = TODO: A more detailed description of logschema.
-	It can span multiple lines, with this indentation.
-depends = 
-	zeek >=4.0.0
-
+summary = Data schema reporting for Zeek logs
+description = This package collects metadata for the logs
+    Zeek produces in a given installation. The schema data
+    are available for export modules, leaving details of the
+    representation and export to those modules.
+depends =
+  zeek >=5.2.0
+  
 [template]
 source = https://github.com/zeek/package-template
 version = v3.1.4
@@ -17,4 +19,3 @@ features = github-ci,license
 name = logschema
 author = Christian Kreibich <christian@corelight.com>
 license = bsd-3
-
