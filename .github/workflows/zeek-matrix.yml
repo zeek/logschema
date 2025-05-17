@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     name: test-${{ matrix.zeekver }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -17,7 +17,7 @@ jobs:
     - uses: zeek/action-zkg-install@v2
       with:
         zeek_version: ${{ matrix.zeekver }}
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: zkg-logs-${{ matrix.zeekver }}
