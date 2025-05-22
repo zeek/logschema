@@ -1,6 +1,6 @@
 [package]
 script_dir = scripts
-test_command = cd testing && btest -c btest.cfg
+test_command = cd testing && ./btest.sh
 summary = Data schema reporting for Zeek logs
 description = This package collects metadata for the logs
     Zeek produces in a given installation. The schema data
