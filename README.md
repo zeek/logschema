@@ -13,7 +13,7 @@ own schemas.
 
 ## Quickstart
 
-Install this package via `zkg install`. The package has no dependencies and
+Install this package via `zkg install logschema`. The package has no dependencies and
 currently works with Zeek 5.2 and newer.
 
 To get a [JSON Schema](https://json-schema.org/) of each Zeek log in your
@@ -390,6 +390,6 @@ Take a look at the exporters in this package to get you started.
 
 Log streams nearly always get defined in `zeek_init()` event handlers. That's
 why the package looks for registered log streams after those handlers have
-run. Howeever, script authors are free to create Zeek logs at any time and under
+run. However, script authors are free to create Zeek logs at any time and under
 arbitrary conditions, so the package will not automatically see such logs. We
 suggest the use of custom `Log::Schema::run_export()` invocations in that case.
