@@ -363,6 +363,8 @@ $ cat zeek-conn-log.schema.json | jq '.properties["service"]'
   "description": "My much better docstring"
 }
 ```
+Consult the logschema package's [`Field` record](https://github.com/zeek/logschema/blob/main/scripts/main.zeek#L6-L32)
+for details on the available log field metadata.
 
 ## Writing your own exporter
 
@@ -388,8 +390,32 @@ Take a look at the exporters in this package to get you started.
 
 ## Common pitfalls
 
+### Completeness
+
 Log streams nearly always get defined in `zeek_init()` event handlers. That's
 why the package looks for registered log streams after those handlers have
 run. However, script authors are free to create Zeek logs at any time and under
 arbitrary conditions, so the package will not automatically see such logs. We
 suggest the use of custom `Log::Schema::run_export()` invocations in that case.
+
+### Ever-changing default field values
+
+A few Zeek logs use `&default` attributes for which this package produces
+different output from run to run in schema formats that capture default values,
+such as CSV. Specifically, the SMB logs have timestamps defaulting to current
+network time, producing different timestamps every time you generate the schema.
+You can adjust this and other troublesome output via the `Log::Schema::adapt()`
+hook mentioned above:
+
+```zeek
+hook Log::Schema::adapt(logs: Log::Schema::LogsTable) {
+    logs[SMB::FILES_LOG]$fields["ts"]$_default = 0.0;
+    logs[SMB::MAPPING_LOG]$fields["ts"]$_default = 0.0;
+}
+```
+
+(You can also suppress this particular churn by redef'ing
+`allow_network_time_forward=F`, which will keep these timestamps at 0.0 when
+producing the schema at startup. You will probably not want to use this approach
+if you're running Zeek in production while producing schemas, since it affects
+Zeek's internal handling of time.)
