@@ -35,6 +35,8 @@ export {
 	type Log: record {
 		name: string;  ##< Name of the log in its short form (e.g. "conn").
 
+		id: Log::ID &default=Log::UNKNOWN; ##< The log's Log::ID identifier.
+
 		## Fields of that log, indexed by their name.
 		fields: table[string] of Field &ordered;
 
@@ -333,7 +335,7 @@ function analyze_stream(id: Log::ID): Log
 		}
 
 	if ( filter$name == Log::no_filter$name )
-		return Log($name = name, $fields = fields);
+		return Log($name=name, $id=id, $fields=fields);
 
 	# Honor log extension fields in the filter.
 	#
@@ -344,7 +346,7 @@ function analyze_stream(id: Log::ID): Log
 	# Just calling the function and using the returned value is prone to
 	# running into "value used but not set" interpreter errors.
 	if ( vector_tail(split_string(type_name(filter$ext_func), / *: */)) == "void" )
-		return Log($name = name, $fields = fields);
+		return Log($name=name, $id=id, $fields=fields);
 
 	local extrec_type = type_name(filter$ext_func(name));
 
@@ -362,7 +364,7 @@ function analyze_stream(id: Log::ID): Log
 			}
 		}
 
-	return Log($name = name, $fields = fields);
+	return Log($name=name, $id=id, $fields=fields);
 	}
 
 function is_single_log_filename(format: string): bool
