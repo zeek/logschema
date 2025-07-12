@@ -4,8 +4,8 @@
 #
 # @TEST-REQUIRES: command -v jq
 # @TEST-EXEC: zeek -b %INPUT
-# @TEST-EXEC: jq 'keys_unsorted[]' zeek-logschema.json >logs
-# @TEST-EXEC: jq '."Testlog::LOG".fields|keys_unsorted[]' zeek-logschema.json >fields
+# @TEST-EXEC: jq '.[].name' zeek-logschema.json >logs
+# @TEST-EXEC: jq '.[] | select(.name=="test").fields.[].name' zeek-logschema.json >fields
 # @TEST-EXEC: btest-diff logs
 # @TEST-EXEC: btest-diff fields
 
