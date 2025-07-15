@@ -36,7 +36,8 @@ $ cat zeek-conn-log.schema.json | jq
   "properties": {
     "ts": {
       "type": "number",
-      "description": "This is the time of the first packet."
+      "description": "This is the time of the first packet.",
+      ...
     },
 ...
 }
@@ -134,21 +135,33 @@ an address string is formatted as an IP address), and they don't yet apply all
 conceivable constraints (such as the integer range of a port number). The
 schemas also don't currently prohibit `additionalProperties`.
 
-The schemas are "data-centric", not "metainformation-centric". For example, the
-Zeek script defining a given log field is currently not included, because JSON
-Schema doesn't provide an immediate keyword to do so. We may add vocabulary to
-convey such things in the future.
+Zeek knows more about its log schema than what JSON Schema's expressiveness can
+capture naturally. For example, there's no immediate "vocabulary" in JSON Schema
+to express that a log field has a certain Zeek type, or that a particular Zeek
+package added it. To convey these properties, the package adds an `x-zeek`
+[annotation](https://json-schema.org/blog/posts/custom-annotations-will-continue)
+to each field's property. Schema validators and other JSON Schema-centric
+applications safely ignore such annotations. The annotation is
+[an object](https://github.com/zeek/logschema/blob/main/scripts/export/jsonschema.zeek#L6-L25)
+including the Zeek type, the record type containing the field, whether the field
+is optional, the script that defined the field, and the package that added the
+field, if applicable. (See [Schema information](#schema-information) above for
+details.)
 
 Each log's schema is self-contained.
 
-Note that Zeek logs in JSON format are technically
+Note that Zeek logs written in JSON format are technically
 [JSONL](https://jsonlines.org/) documents, i.e., every line in a log is a JSON
-document. Keep this in mind when validating logs.
+document. Keep this in mind when validating logs, since the validator might need
+nudging to accept this format.
 
 #### Customization
 
 Redef `Log::Schema::JSONSchema::filename` to control the file output, see below
 for details.
+
+You can omit the `x-zeek` annotation by redef'ing
+`Log::Schema::JSONSchema::add_zeek_annotations` to `F`.
 
 #### Example
 
@@ -162,7 +175,13 @@ $ cat zeek-conn-log.schema.json | jq
   "properties": {
     "ts": {
       "type": "number",
-      "description": "This is the time of the first packet."
+      "description": "This is the time of the first packet.",
+      "x-zeek": {
+        "type": "time",
+        "record_type": "Conn::Info",
+        "is_optional": false,
+        "script": "base/protocols/conn/main.zeek"
+      }
     },
 ...
 }
