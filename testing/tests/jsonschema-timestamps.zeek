@@ -1,7 +1,7 @@
 # Test timestamp properties in the JSON Schema export.
 #
 # @TEST-REQUIRES: command -v jq
-# @TEST-EXEC: zeek -b %INPUT 2>stderr
+# @TEST-EXEC: zeek -b %INPUT Log::Schema::JSONSchema::add_zeek_annotations=F 2>stderr
 # @TEST-EXEC: btest-diff stderr
 # @TEST-EXEC: TEST_DIFF_CANONIFIER=$SCRIPTS/diff-prettify-json btest-diff zeek-test-log.schema.json
 
