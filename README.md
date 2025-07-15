@@ -274,15 +274,23 @@ analyzer        analyzer_kind   string  Analyzer::Logging::Info base/frameworks/
 @load logschema/export/json
 ```
 
-This exporter just runs the package's internal log state through `to_json()` to
-produce the schema, and is just a handful of lines of code. While simple, this
-naturally features all information the log analysis builds up. We mostly
-consider this a development/troubleshooting tool and wouldn't recommend it for
-actual schema use.
+This exporter essentially runs the package's internal log analysis state through
+`to_json()` to produce the schema, and is just a handful of lines of code. While
+simple, this naturally features all log information the schema analysis is aware
+of.
 
 By default, this writes a single output file called `zeek-logschema.json`. The
-toplevel JSON value is an object, with each key being a Zeek `Log::ID` and the
-value the corresponding state.
+result is a JSON array of objects, each representing a log. Each object has three members:
+
+- "name", the name of the log (such as "conn" for conn.log),
+- "id", the Log::ID enum identifying the log stream in Zeek,
+- "fields", an array of fields that each contain the JSON rendering of a Log::Schema::Log record.
+
+The sequence of logs is sorted alphabetically by name, and the sequence of
+fields is in the order they're defined in the corresponding Zeek records.
+
+When writing individual schema files per log, each file contains the JSON object
+for the respective log.
 
 #### Customization
 
@@ -293,25 +301,18 @@ for details.
 
 ```console
 $ cat zeek-logschema.json | jq
-{
-  "Analyzer::Logging::LOG": {
+[
+  {
     "name": "analyzer",
-    "fields": {
-      "ts": {
+    "id": "Analyzer::Logging::LOG",
+    "fields": [
+      {
         "name": "ts",
         "type": "time",
         "record_type": "Analyzer::Logging::Info",
-        "script": "base/frameworks/analyzer/logging.zeek",
         "is_optional": false,
-        "docstring": "Timestamp of confirmation or violation."
-      },
-      "cause": {
-        "name": "cause",
-        "type": "string",
-        "record_type": "Analyzer::Logging::Info",
-        "script": "base/frameworks/analyzer/logging.zeek",
-        "is_optional": false,
-        "docstring": "What caused this log entry to be produced. This can\ncurrently be \"violation\" or \"confirmation\"."
+        "docstring": "Timestamp of the violation.",
+        "script": "base/frameworks/analyzer/logging.zeek"
       },
       ...
 ```
