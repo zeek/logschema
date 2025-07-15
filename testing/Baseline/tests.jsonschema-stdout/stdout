@@ -7,7 +7,13 @@
   "properties": {
     "a": {
       "type": "string",
-      "description": "An address."
+      "description": "An address.",
+      "x-zeek": {
+        "type": "addr",
+        "record_type": "Second::Info",
+        "is_optional": false,
+        "script": "secondlog.zeek"
+      }
     }
   },
   "required": [
@@ -22,19 +28,43 @@
   "properties": {
     "a": {
       "type": "string",
-      "description": "An address. Also a comment with \"quotation marks\",\nto verify escaping."
+      "description": "An address. Also a comment with \"quotation marks\",\nto verify escaping.",
+      "x-zeek": {
+        "type": "addr",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "b": {
       "type": "boolean",
-      "description": "A boolean."
+      "description": "A boolean.",
+      "x-zeek": {
+        "type": "bool",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "c": {
       "type": "integer",
-      "description": "A count."
+      "description": "A count.",
+      "x-zeek": {
+        "type": "count",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "d": {
       "type": "number",
-      "description": "A double."
+      "description": "A double.",
+      "x-zeek": {
+        "type": "double",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "e": {
       "enum": [
@@ -43,67 +73,163 @@
         "udp",
         "unknown_transport"
       ],
-      "description": "An enum."
+      "description": "An enum.",
+      "x-zeek": {
+        "type": "enum transport_proto",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "i": {
       "type": "integer",
-      "description": "An integer."
+      "description": "An integer.",
+      "x-zeek": {
+        "type": "int",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "ival": {
       "type": "number",
-      "description": "An interval."
+      "description": "An interval.",
+      "x-zeek": {
+        "type": "interval",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "p": {
       "type": "integer",
-      "description": "A port."
+      "description": "A port.",
+      "x-zeek": {
+        "type": "port",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "r.orig_h": {
       "type": "string",
-      "description": "The originator's IP address."
+      "description": "The originator's IP address.",
+      "x-zeek": {
+        "type": "addr",
+        "record_type": "conn_id",
+        "is_optional": false,
+        "script": "base/init-bare.zeek"
+      }
     },
     "r.orig_p": {
       "type": "integer",
-      "description": "The originator's port number."
+      "description": "The originator's port number.",
+      "x-zeek": {
+        "type": "port",
+        "record_type": "conn_id",
+        "is_optional": false,
+        "script": "base/init-bare.zeek"
+      }
     },
     "r.resp_h": {
       "type": "string",
-      "description": "The responder's IP address."
+      "description": "The responder's IP address.",
+      "x-zeek": {
+        "type": "addr",
+        "record_type": "conn_id",
+        "is_optional": false,
+        "script": "base/init-bare.zeek"
+      }
     },
     "r.resp_p": {
       "type": "integer",
-      "description": "The responder's port number."
+      "description": "The responder's port number.",
+      "x-zeek": {
+        "type": "port",
+        "record_type": "conn_id",
+        "is_optional": false,
+        "script": "base/init-bare.zeek"
+      }
     },
     "st": {
       "type": "array",
-      "description": "A set."
+      "description": "A set.",
+      "x-zeek": {
+        "type": "set[count]",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "s": {
       "type": "string",
-      "description": "A string."
+      "description": "A string.",
+      "x-zeek": {
+        "type": "string",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "sub": {
       "type": "string",
-      "description": "A subnet."
+      "description": "A subnet.",
+      "x-zeek": {
+        "type": "subnet",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "t": {
       "type": "number",
-      "description": "A timestamp."
+      "description": "A timestamp.",
+      "x-zeek": {
+        "type": "time",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "v": {
       "type": "array",
-      "description": "A vector."
+      "description": "A vector.",
+      "x-zeek": {
+        "type": "vector of count",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     },
     "sd": {
       "type": "string",
+      "description": "A default value.",
       "default": "yes",
-      "description": "A default value."
+      "x-zeek": {
+        "type": "string",
+        "record_type": "Testlog::Info",
+        "is_optional": true,
+        "script": "testlog.zeek"
+      }
     },
     "so": {
       "type": "string",
-      "description": "An optional value."
+      "description": "An optional value.",
+      "x-zeek": {
+        "type": "string",
+        "record_type": "Testlog::Info",
+        "is_optional": true,
+        "script": "testlog.zeek"
+      }
     },
     "aa_plaincomment": {
-      "type": "string"
+      "type": "string",
+      "x-zeek": {
+        "type": "string",
+        "record_type": "Testlog::Info",
+        "is_optional": false,
+        "script": "testlog.zeek"
+      }
     }
   },
   "required": [
