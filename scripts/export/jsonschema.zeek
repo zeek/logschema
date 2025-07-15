@@ -77,6 +77,10 @@ function sorted_enum_names(typ: string): vector of string
 	return names;
 	}
 
+# For the given type name, adds the JSON-relevant type, or the full enum type
+# description, to the property table. When the type is an enum, this enumerates
+# the possible enum values, and omits the type, as per the JSON Schema spec.
+# For timestamps, the mapping depends on the LogAscii::json_timestamps setting.
 function property_fill_type(prop: JSONTable, typ: string)
 	{
 	if ( /^(set|vector)/ in typ )
@@ -105,7 +109,7 @@ function property_fill_type(prop: JSONTable, typ: string)
 				prop["type"] = "number";
 				break;
 			case JSON::TS_MILLIS:
-				prop["type"] ="integer";
+				prop["type"] = "integer";
 				break;
 			case JSON::TS_ISO8601:
 				prop["type"] = "string";
