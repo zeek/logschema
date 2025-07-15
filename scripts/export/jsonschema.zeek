@@ -3,17 +3,35 @@ module Log::Schema::JSONSchema;
 @load ..
 
 export {
-	# A single property, in JSON Schema parlance: represents a log field.
-	type Property: record {
-		_type: string &optional;
-		_enum: any &optional; # For enums; when used, _type is omitted
-		_default: any &optional;
-		description: string &optional;
+	## Zeek-specific properties that don't fit into the JSON Schema
+	## framework. We add these as a "x-zeek" annotation object in each
+	## field's properties. For more on annotations, see:
+	## https://json-schema.org/blog/posts/custom-annotations-will-continue
+	type ZeekAnnotations: record {
+		## The native Zeek type (addr, etc).
+		_type: string;
+		## Record type containing this field (e.g. "Conn::Info", "conn_id").
+		record_type: string;
+		## Whether the field is optional. This is itself optional since
+		## it's not available before Zeek 6.
+		is_optional: bool &optional;
+		## Script that defines the field, relative to the scripts folder
+		## (e.g. "base/init-bare.zeek"). This is optional because it's
+		## not available before Zeek 6.0.
+		script: string &optional;
+		## If part of a Zeek package, the name of the package that provides
+		## the field, sans owner ("hello-world", not "zeek/hello-world").
+		package: string &optional;
 	};
+
+	# A helper type for tables collecting arbitrary values, to be turned
+	# into JSON via to_json(). This allows more flexible field naming
+	# than what's possible via Zeek records printed via to_json().
+	type JSONTable: table[string] of any;
 
 	# The JSON Schema representation of the schema data.
 	type Export: record {
-		schema: table[string] of any &ordered; # The JSON structure of the resulting schema
+		schema: JSONTable &ordered; # The JSON structure of the resulting schema
 	};
 
 	# Define common keys for every schema.
@@ -24,7 +42,7 @@ export {
 	# sub-schemas anywhere either.
 	#
 	# Careful: ordering works only when initializing via table(), not {} (zeek/zeek#4448).
-	const schema_template: table[string] of any = table(
+	const schema_template: JSONTable = table(
 		["$schema"] = "https://json-schema.org/draft/2020-12/schema",
 		["title"] = "",
 		["description"] = "",
@@ -38,6 +56,9 @@ export {
 	## one line per schema. For supported substitutions, see
 	## Log::Schema::create_filename().
 	const filename = "zeek-{log}-log.schema.json" &redef;
+
+	## Whether to include the x-zeek annotation object in field properties.
+	const add_zeek_annotations = T &redef;
 }
 
 # Tuck each log's resulting schema onto the Log record:
@@ -56,23 +77,23 @@ function sorted_enum_names(typ: string): vector of string
 	return names;
 	}
 
-function property_fill_type(prop: Property, typ: string)
+function property_fill_type(prop: JSONTable, typ: string)
 	{
 	if ( /^(set|vector)/ in typ )
-		prop$_type = "array";
+		prop["type"] = "array";
 	else if ( typ == "count" || typ == "int" )
-		prop$_type = "integer";
+		prop["type"] = "integer";
 	else if ( typ == "port" )
-		prop$_type ="integer";
+		prop["type"] ="integer";
 	else if ( typ == "double" || typ == "interval" )
-		prop$_type ="number";
+		prop["type"] ="number";
 	else if ( typ == "string" || typ == "addr" || typ == "subnet" || typ == "pattern" )
 		# XXX we could add format support here but it looks pretty limited
 		# (e.g., distinguish addresses from subnets?):
 		# https://www.learnjsonschema.com/2020-12/format-annotation/format/
-		prop$_type ="string";
+		prop["type"] ="string";
 	else if ( typ == "bool" )
-		prop$_type ="boolean";
+		prop["type"] ="boolean";
 	else if ( typ == "time" )
 		{
 		# This depends on the configured format for JSON timestamps.
@@ -81,13 +102,13 @@ function property_fill_type(prop: Property, typ: string)
 			{
 			case JSON::TS_EPOCH:
 				# This is the default.
-				prop$_type = "number";
+				prop["type"] = "number";
 				break;
 			case JSON::TS_MILLIS:
-				prop$_type ="integer";
+				prop["type"] ="integer";
 				break;
 			case JSON::TS_ISO8601:
-				prop$_type = "string";
+				prop["type"] = "string";
 				break;
 			default:
 				Reporter::warning(fmt("Unexpected JSON timestamp format: %s",
@@ -101,7 +122,7 @@ function property_fill_type(prop: Property, typ: string)
 		# "type" is best not used in this case, according to:
 		# https://www.learnjsonschema.com/2020-12/validation/enum/
 		# "typ" here is "enum <type>", e.g. "enum transport_proto".
-		prop$_enum = sorted_enum_names(split_string1(typ, / /)[1]);
+		prop["enum"] = sorted_enum_names(split_string1(typ, / /)[1]);
 		}
 	else
 		Reporter::warning(fmt("Unexpected type string for JSON Schema mapping: %s", typ));
@@ -113,28 +134,46 @@ function process_log(ex: Log::Schema::Exporter, log: Log::Schema::Log)
 	schema["title"] = fmt("Schema for Zeek %s.log", log$name);
 	schema["description"] = fmt("JSON Schema for Zeek %s.log", log$name);
 
-	local properties: table[string] of Property = table() &ordered;
+	local properties: table[string] of JSONTable = table() &ordered;
 	local required: vector of string = vector();
 
 	for ( _, field in log$fields )
 		{
-		local prop = Property();
+		# We can't express the "x-zeek" annotation as a standard
+		# Zeek record field name (to_json() would need some sort
+		# of substitution logic to do so), so we express the whole
+		# property as a table.
+		local prop: JSONTable = table() &ordered;
 
 		property_fill_type(prop, field$_type);
 
 		if ( field?$docstring )
-			prop$description = field$docstring;
+			prop["description"] = field$docstring;
 		if ( field?$_default )
-			prop$_default = field$_default;
+			prop["default"] = field$_default;
 		if ( field?$is_optional && ! field$is_optional )
 			required += field$name;
 
-		# There are various features in JSON Schema that are
+		# There are various keywords in JSON Schema that are
 		# hard to cover here, like minItems, uniqueItems, that
 		# are not explicitly captured in Zeek's log Info
 		# records, so we skip those here. Some might be
 		# universally true and we could set them here, for all
 		# properties.
+
+		if ( add_zeek_annotations )
+			{
+			local annos = ZeekAnnotations($_type=field$_type, $record_type=field$record_type);
+
+			if ( field?$is_optional )
+				annos$is_optional = field$is_optional;
+			if ( field?$script )
+				annos$script = field$script;
+			if ( field?$package )
+				annos$package = field$package;
+
+			prop["x-zeek"] = annos;
+			}
 
 		properties[field$name] = prop;
 		}

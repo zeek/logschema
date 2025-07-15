@@ -26,8 +26,8 @@ export {
 		## (e.g. "base/init-bare.zeek"). This is optional because it's
 		## not available before Zeek 6.0.
 		script: string &optional;
-		## If part of a Zeek package, the package's name sans owner
-		## ("hello-world", not "zeek/hello-world").
+		## If part of a Zeek package, the name of the package that provides
+		## the field, sans owner ("hello-world", not "zeek/hello-world").
 		package: string &optional;
 	};
 
