@@ -77,14 +77,51 @@ function sorted_enum_names(typ: string): vector of string
 	return names;
 	}
 
+# Helper to parse the element type from sets and vectors.
+# For example, for "vector of string", returns "string".
+# Returns empty string in case of trouble.
+function container_element_type(typ: string): string
+	{
+	local parts: string_vec;
+
+	if ( /^set *\[/ in typ )
+		{
+		parts = split_string(typ, / *[\[\]] */);
+		if ( |parts| < 2 )
+			return "";
+		return parts[1];
+		}
+
+	if ( /^vector / in typ )
+		{
+		parts = split_string(typ, / +/);
+		if ( |parts| < 3 )
+			return "";
+		return parts[2];
+		}
+
+	return "";
+	}
+
 # For the given type name, adds the JSON-relevant type, or the full enum type
 # description, to the property table. When the type is an enum, this enumerates
 # the possible enum values, and omits the type, as per the JSON Schema spec.
 # For timestamps, the mapping depends on the LogAscii::json_timestamps setting.
 function property_fill_type(prop: JSONTable, typ: string)
 	{
-	if ( /^(set|vector)/ in typ )
+	local elem_type: string;
+	local helper_table: JSONTable = table() &ordered;
+
+	if ( /^(set *\[|vector )/ in typ )
+		{
 		prop["type"] = "array";
+		elem_type = container_element_type(typ);
+		if ( |elem_type| > 0 )
+			{
+			property_fill_type(helper_table, elem_type);
+			prop["items"] = helper_table;
+			}
+		}
 	else if ( typ == "count" || typ == "int" )
 		prop["type"] = "integer";
 	else if ( typ == "port" )

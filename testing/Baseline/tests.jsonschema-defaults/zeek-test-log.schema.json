@@ -132,6 +132,9 @@
     },
     "st": {
       "type": "array",
+      "items": {
+        "type": "integer"
+      },
       "description": "A set.",
       "x-zeek": {
         "type": "set[count]",
@@ -172,6 +175,9 @@
     },
     "v": {
       "type": "array",
+      "items": {
+        "type": "integer"
+      },
       "description": "A vector.",
       "x-zeek": {
         "type": "vector of count",
