@@ -188,12 +188,23 @@ function field_set_script(f: Field, qualified_fieldname: string)
 
 function get_record_fields(type_name: string, log_only: bool): vector of record_field
 	{
-	# record_fields() provides detailed field info, while
-	# record_type_to_vector() provides reliably ordered field names. Stitch
-	# them together:
-	local rfields_table = record_fields(type_name);
-	local rfields = record_type_to_vector(type_name);
 	local res: vector of record_field;
+	local rfields_table = record_fields(type_name);
+
+@if ( Version::at_least("8.0") )
+	for ( fieldname, rfield in rfields_table )
+		{
+		if ( log_only && ! rfield$log )
+			next;
+
+		rfield$name = fieldname;
+		res += rfield;
+		}
+@else
+	# Prior to Zeek 8, record_fields() provided detailed field info but not
+	# reliable ordering, while record_type_to_vector() provided reliably
+	# ordered field names but insufficient detail. Stitch them together:
+	local rfields = record_type_to_vector(type_name);
 
 	for ( _, fieldname in rfields )
 		{
@@ -203,6 +214,7 @@ function get_record_fields(type_name: string, log_only: bool): vector of record_
 		rfields_table[fieldname]$name = fieldname;
 		res += rfields_table[fieldname];
 		}
+@endif
 
 	return res;
 	}
