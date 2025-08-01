@@ -7,6 +7,9 @@
   "properties": {
     "t": {
       "type": "string",
+      "examples": [
+        "2025-01-24T04:03:52.132607Z"
+      ],
       "description": "A timestamp."
     }
   },

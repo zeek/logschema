@@ -64,6 +64,22 @@ export {
 	## a count cannot be negative. Might not be required for a JSON schema
 	## that's largely descriptive and not used for tight validation.
 	const add_detailed_constraints = T &redef;
+
+	## Whether to add examples for some types that might benefit the user.
+	const add_examples = T &redef;
+
+	# Actually using to_json() for the following is a bit tedious since
+	# it produces "proper" JSON strings in the resulting strings, and isn't
+	# feasible for the timestamp formats, which only result in log writes.
+	# So keep this manual for now:
+	const addr_examples = vector("192.168.0.1", "fe80::208:74ff:feda:6210") &redef;
+	const subnet_examples = vector("192.168.0.0/24", "fe80::/10") &redef;
+	const time_examples: table[JSON::TimestampFormat] of vector of string = {
+		[JSON::TS_EPOCH] = vector("1737691432.132607"),
+		[JSON::TS_MILLIS] = vector("1737691432132"),
+		[JSON::TS_MILLIS_UNSIGNED] = vector("1737691432132"),
+		[JSON::TS_ISO8601] = vector("2025-01-24T04:03:52.132607Z"),
+	} &redef;
 }
 
 # Tuck each log's resulting schema onto the Log record:
@@ -146,11 +162,23 @@ function property_fill_type(prop: JSONTable, typ: string)
 		}
 	else if ( typ == "double" || typ == "interval" )
 		prop["type"] ="number";
-	else if ( typ == "string" || typ == "addr" || typ == "subnet" || typ == "pattern" )
+	else if ( typ == "string" || typ == "pattern" )
+		prop["type"] ="string";
+	else if ( typ == "addr" )
+		{
 		# XXX we could add format support here but it looks pretty limited
 		# (e.g., distinguish addresses from subnets?):
 		# https://www.learnjsonschema.com/2020-12/format-annotation/format/
 		prop["type"] ="string";
+		if ( add_examples )
+			prop["examples"] = addr_examples;
+		}
+	else if ( typ == "subnet" )
+		{
+		prop["type"] ="string";
+		if ( add_examples )
+			prop["examples"] = subnet_examples;
+		}
 	else if ( typ == "bool" )
 		prop["type"] ="boolean";
 	else if ( typ == "time" )
@@ -162,12 +190,25 @@ function property_fill_type(prop: JSONTable, typ: string)
 			case JSON::TS_EPOCH:
 				# This is the default.
 				prop["type"] = "number";
+				if ( add_examples )
+					prop["examples"] = time_examples[LogAscii::json_timestamps];
 				break;
 			case JSON::TS_MILLIS:
 				prop["type"] = "integer";
+				if ( add_examples )
+					prop["examples"] = time_examples[LogAscii::json_timestamps];
+				break;
+			case JSON::TS_MILLIS_UNSIGNED:
+				prop["type"] = "integer";
+				if ( add_detailed_constraints )
+					prop["minimum"] = 0;
+				if ( add_examples )
+					prop["examples"] = time_examples[LogAscii::json_timestamps];
 				break;
 			case JSON::TS_ISO8601:
 				prop["type"] = "string";
+				if ( add_examples )
+					prop["examples"] = time_examples[LogAscii::json_timestamps];
 				break;
 			default:
 				Reporter::warning(fmt("Unexpected JSON timestamp format: %s",

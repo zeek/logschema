@@ -7,6 +7,9 @@
   "properties": {
     "t": {
       "type": "number",
+      "examples": [
+        "1737691432.132607"
+      ],
       "description": "A timestamp."
     }
   },

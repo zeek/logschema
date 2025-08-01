@@ -7,6 +7,10 @@
   "properties": {
     "a": {
       "type": "string",
+      "examples": [
+        "192.168.0.1",
+        "fe80::208:74ff:feda:6210"
+      ],
       "description": "An address.",
       "x-zeek": {
         "type": "addr",
@@ -28,6 +32,10 @@
   "properties": {
     "a": {
       "type": "string",
+      "examples": [
+        "192.168.0.1",
+        "fe80::208:74ff:feda:6210"
+      ],
       "description": "An address. Also a comment with \"quotation marks\",\nto verify escaping.",
       "x-zeek": {
         "type": "addr",
@@ -116,6 +124,10 @@
     },
     "r.orig_h": {
       "type": "string",
+      "examples": [
+        "192.168.0.1",
+        "fe80::208:74ff:feda:6210"
+      ],
       "description": "The originator's IP address.",
       "x-zeek": {
         "type": "addr",
@@ -138,6 +150,10 @@
     },
     "r.resp_h": {
       "type": "string",
+      "examples": [
+        "192.168.0.1",
+        "fe80::208:74ff:feda:6210"
+      ],
       "description": "The responder's IP address.",
       "x-zeek": {
         "type": "addr",
@@ -184,6 +200,10 @@
     },
     "sub": {
       "type": "string",
+      "examples": [
+        "192.168.0.0/24",
+        "fe80::/10"
+      ],
       "description": "A subnet.",
       "x-zeek": {
         "type": "subnet",
@@ -194,6 +214,9 @@
     },
     "t": {
       "type": "number",
+      "examples": [
+        "1737691432.132607"
+      ],
       "description": "A timestamp.",
       "x-zeek": {
         "type": "time",
