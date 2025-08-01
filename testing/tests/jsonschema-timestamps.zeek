@@ -25,6 +25,14 @@ redef LogAscii::json_timestamps = JSON::TS_MILLIS;
 @load ./timestamp-only
 @load logschema/export/jsonschema
 
+redef LogAscii::json_timestamps = JSON::TS_MILLIS_UNSIGNED;
+
+# @TEST-START-NEXT
+
+@load ./testlog
+@load ./timestamp-only
+@load logschema/export/jsonschema
+
 redef LogAscii::json_timestamps = JSON::TS_ISO8601;
 
 # @TEST-START-FILE timestamp-only.zeek

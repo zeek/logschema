@@ -6,8 +6,12 @@
   "type": "object",
   "properties": {
     "a": {
-      "type": "string",
       "description": "An address. Also a comment with \"quotation marks\",\nto verify escaping.",
+      "type": "string",
+      "examples": [
+        "192.168.0.1",
+        "fe80::208:74ff:feda:6210"
+      ],
       "x-zeek": {
         "type": "addr",
         "record_type": "Testlog::Info",
@@ -16,8 +20,8 @@
       }
     },
     "b": {
-      "type": "boolean",
       "description": "A boolean.",
+      "type": "boolean",
       "x-zeek": {
         "type": "bool",
         "record_type": "Testlog::Info",
@@ -26,8 +30,9 @@
       }
     },
     "c": {
-      "type": "integer",
       "description": "A count.",
+      "type": "integer",
+      "minimum": 0,
       "x-zeek": {
         "type": "count",
         "record_type": "Testlog::Info",
@@ -36,8 +41,8 @@
       }
     },
     "d": {
-      "type": "number",
       "description": "A double.",
+      "type": "number",
       "x-zeek": {
         "type": "double",
         "record_type": "Testlog::Info",
@@ -46,13 +51,13 @@
       }
     },
     "e": {
+      "description": "An enum.",
       "enum": [
         "icmp",
         "tcp",
         "udp",
         "unknown_transport"
       ],
-      "description": "An enum.",
       "x-zeek": {
         "type": "enum transport_proto",
         "record_type": "Testlog::Info",
@@ -61,8 +66,8 @@
       }
     },
     "i": {
-      "type": "integer",
       "description": "An integer.",
+      "type": "integer",
       "x-zeek": {
         "type": "int",
         "record_type": "Testlog::Info",
@@ -71,8 +76,8 @@
       }
     },
     "ival": {
-      "type": "number",
       "description": "An interval.",
+      "type": "number",
       "x-zeek": {
         "type": "interval",
         "record_type": "Testlog::Info",
@@ -81,8 +86,10 @@
       }
     },
     "p": {
-      "type": "integer",
       "description": "A port.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535,
       "x-zeek": {
         "type": "port",
         "record_type": "Testlog::Info",
@@ -91,8 +98,12 @@
       }
     },
     "r.orig_h": {
-      "type": "string",
       "description": "The originator's IP address.",
+      "type": "string",
+      "examples": [
+        "192.168.0.1",
+        "fe80::208:74ff:feda:6210"
+      ],
       "x-zeek": {
         "type": "addr",
         "record_type": "conn_id",
@@ -101,8 +112,10 @@
       }
     },
     "r.orig_p": {
-      "type": "integer",
       "description": "The originator's port number.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535,
       "x-zeek": {
         "type": "port",
         "record_type": "conn_id",
@@ -111,8 +124,12 @@
       }
     },
     "r.resp_h": {
-      "type": "string",
       "description": "The responder's IP address.",
+      "type": "string",
+      "examples": [
+        "192.168.0.1",
+        "fe80::208:74ff:feda:6210"
+      ],
       "x-zeek": {
         "type": "addr",
         "record_type": "conn_id",
@@ -121,8 +138,10 @@
       }
     },
     "r.resp_p": {
-      "type": "integer",
       "description": "The responder's port number.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535,
       "x-zeek": {
         "type": "port",
         "record_type": "conn_id",
@@ -131,8 +150,12 @@
       }
     },
     "st": {
-      "type": "array",
       "description": "A set.",
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      },
       "x-zeek": {
         "type": "set[count]",
         "record_type": "Testlog::Info",
@@ -141,8 +164,8 @@
       }
     },
     "s": {
-      "type": "string",
       "description": "A string.",
+      "type": "string",
       "x-zeek": {
         "type": "string",
         "record_type": "Testlog::Info",
@@ -151,8 +174,12 @@
       }
     },
     "sub": {
-      "type": "string",
       "description": "A subnet.",
+      "type": "string",
+      "examples": [
+        "192.168.0.0/24",
+        "fe80::/10"
+      ],
       "x-zeek": {
         "type": "subnet",
         "record_type": "Testlog::Info",
@@ -161,8 +188,11 @@
       }
     },
     "t": {
-      "type": "number",
       "description": "A timestamp.",
+      "type": "number",
+      "examples": [
+        "1737691432.132607"
+      ],
       "x-zeek": {
         "type": "time",
         "record_type": "Testlog::Info",
@@ -171,8 +201,12 @@
       }
     },
     "v": {
-      "type": "array",
       "description": "A vector.",
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      },
       "x-zeek": {
         "type": "vector of count",
         "record_type": "Testlog::Info",
@@ -181,8 +215,8 @@
       }
     },
     "sd": {
-      "type": "string",
       "description": "A default value.",
+      "type": "string",
       "default": "yes",
       "x-zeek": {
         "type": "string",
@@ -192,8 +226,8 @@
       }
     },
     "so": {
-      "type": "string",
       "description": "An optional value.",
+      "type": "string",
       "x-zeek": {
         "type": "string",
         "record_type": "Testlog::Info",

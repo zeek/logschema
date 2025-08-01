@@ -59,6 +59,27 @@ export {
 
 	## Whether to include the x-zeek annotation object in field properties.
 	const add_zeek_annotations = T &redef;
+
+	## Whether to include detailed constraints, such as the fact that
+	## a count cannot be negative. Might not be required for a JSON schema
+	## that's largely descriptive and not used for tight validation.
+	const add_detailed_constraints = T &redef;
+
+	## Whether to add examples for some types that might benefit the user.
+	const add_examples = T &redef;
+
+	# Actually using to_json() for the following is a bit tedious since
+	# it produces "proper" JSON strings in the resulting strings, and isn't
+	# feasible for the timestamp formats, which only result in log writes.
+	# So keep this manual for now:
+	const addr_examples = vector("192.168.0.1", "fe80::208:74ff:feda:6210") &redef;
+	const subnet_examples = vector("192.168.0.0/24", "fe80::/10") &redef;
+	const time_examples: table[JSON::TimestampFormat] of vector of string = {
+		[JSON::TS_EPOCH] = vector("1737691432.132607"),
+		[JSON::TS_MILLIS] = vector("1737691432132"),
+		[JSON::TS_MILLIS_UNSIGNED] = vector("1737691432132"),
+		[JSON::TS_ISO8601] = vector("2025-01-24T04:03:52.132607Z"),
+	} &redef;
 }
 
 # Tuck each log's resulting schema onto the Log record:
@@ -77,25 +98,87 @@ function sorted_enum_names(typ: string): vector of string
 	return names;
 	}
 
+# Helper to parse the element type from sets and vectors.
+# For example, for "vector of string", returns "string".
+# Returns empty string in case of trouble.
+function container_element_type(typ: string): string
+	{
+	local parts: string_vec;
+
+	if ( /^set *\[/ in typ )
+		{
+		parts = split_string(typ, / *[\[\]] */);
+		if ( |parts| < 2 )
+			return "";
+		return parts[1];
+		}
+
+	if ( /^vector / in typ )
+		{
+		parts = split_string(typ, / +/);
+		if ( |parts| < 3 )
+			return "";
+		return parts[2];
+		}
+
+	return "";
+	}
+
 # For the given type name, adds the JSON-relevant type, or the full enum type
 # description, to the property table. When the type is an enum, this enumerates
 # the possible enum values, and omits the type, as per the JSON Schema spec.
 # For timestamps, the mapping depends on the LogAscii::json_timestamps setting.
 function property_fill_type(prop: JSONTable, typ: string)
 	{
-	if ( /^(set|vector)/ in typ )
+	local elem_type: string;
+	local helper_table: JSONTable = table() &ordered;
+
+	if ( /^(set *\[|vector )/ in typ )
+		{
 		prop["type"] = "array";
-	else if ( typ == "count" || typ == "int" )
+		elem_type = container_element_type(typ);
+		if ( |elem_type| > 0 )
+			{
+			property_fill_type(helper_table, elem_type);
+			prop["items"] = helper_table;
+			}
+		}
+	else if ( typ == "count" )
+		{
+		prop["type"] = "integer";
+		if ( add_detailed_constraints )
+			prop["minimum"] = 0;
+		}
+	else if ( typ == "int" )
 		prop["type"] = "integer";
 	else if ( typ == "port" )
+		{
 		prop["type"] ="integer";
+		if ( add_detailed_constraints )
+			{
+			prop["minimum"] = 0;
+			prop["maximum"] = 65535;
+			}
+		}
 	else if ( typ == "double" || typ == "interval" )
 		prop["type"] ="number";
-	else if ( typ == "string" || typ == "addr" || typ == "subnet" || typ == "pattern" )
+	else if ( typ == "string" || typ == "pattern" )
+		prop["type"] ="string";
+	else if ( typ == "addr" )
+		{
 		# XXX we could add format support here but it looks pretty limited
 		# (e.g., distinguish addresses from subnets?):
 		# https://www.learnjsonschema.com/2020-12/format-annotation/format/
 		prop["type"] ="string";
+		if ( add_examples )
+			prop["examples"] = addr_examples;
+		}
+	else if ( typ == "subnet" )
+		{
+		prop["type"] ="string";
+		if ( add_examples )
+			prop["examples"] = subnet_examples;
+		}
 	else if ( typ == "bool" )
 		prop["type"] ="boolean";
 	else if ( typ == "time" )
@@ -107,12 +190,25 @@ function property_fill_type(prop: JSONTable, typ: string)
 			case JSON::TS_EPOCH:
 				# This is the default.
 				prop["type"] = "number";
+				if ( add_examples )
+					prop["examples"] = time_examples[LogAscii::json_timestamps];
 				break;
 			case JSON::TS_MILLIS:
 				prop["type"] = "integer";
+				if ( add_examples )
+					prop["examples"] = time_examples[LogAscii::json_timestamps];
+				break;
+			case JSON::TS_MILLIS_UNSIGNED:
+				prop["type"] = "integer";
+				if ( add_detailed_constraints )
+					prop["minimum"] = 0;
+				if ( add_examples )
+					prop["examples"] = time_examples[LogAscii::json_timestamps];
 				break;
 			case JSON::TS_ISO8601:
 				prop["type"] = "string";
+				if ( add_examples )
+					prop["examples"] = time_examples[LogAscii::json_timestamps];
 				break;
 			default:
 				Reporter::warning(fmt("Unexpected JSON timestamp format: %s",
@@ -149,10 +245,11 @@ function process_log(ex: Log::Schema::Exporter, log: Log::Schema::Log)
 		# property as a table.
 		local prop: JSONTable = table() &ordered;
 
-		property_fill_type(prop, field$_type);
-
 		if ( field?$docstring )
 			prop["description"] = field$docstring;
+
+		property_fill_type(prop, field$_type);
+
 		if ( field?$_default )
 			prop["default"] = field$_default;
 		if ( field?$is_optional && ! field$is_optional )
