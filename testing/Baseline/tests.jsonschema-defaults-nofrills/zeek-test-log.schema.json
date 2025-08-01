@@ -6,92 +6,92 @@
   "type": "object",
   "properties": {
     "a": {
-      "type": "string",
-      "description": "An address. Also a comment with \"quotation marks\",\nto verify escaping."
+      "description": "An address. Also a comment with \"quotation marks\",\nto verify escaping.",
+      "type": "string"
     },
     "b": {
-      "type": "boolean",
-      "description": "A boolean."
+      "description": "A boolean.",
+      "type": "boolean"
     },
     "c": {
-      "type": "integer",
-      "description": "A count."
+      "description": "A count.",
+      "type": "integer"
     },
     "d": {
-      "type": "number",
-      "description": "A double."
+      "description": "A double.",
+      "type": "number"
     },
     "e": {
+      "description": "An enum.",
       "enum": [
         "icmp",
         "tcp",
         "udp",
         "unknown_transport"
-      ],
-      "description": "An enum."
+      ]
     },
     "i": {
-      "type": "integer",
-      "description": "An integer."
+      "description": "An integer.",
+      "type": "integer"
     },
     "ival": {
-      "type": "number",
-      "description": "An interval."
+      "description": "An interval.",
+      "type": "number"
     },
     "p": {
-      "type": "integer",
-      "description": "A port."
+      "description": "A port.",
+      "type": "integer"
     },
     "r.orig_h": {
-      "type": "string",
-      "description": "The originator's IP address."
+      "description": "The originator's IP address.",
+      "type": "string"
     },
     "r.orig_p": {
-      "type": "integer",
-      "description": "The originator's port number."
+      "description": "The originator's port number.",
+      "type": "integer"
     },
     "r.resp_h": {
-      "type": "string",
-      "description": "The responder's IP address."
+      "description": "The responder's IP address.",
+      "type": "string"
     },
     "r.resp_p": {
-      "type": "integer",
-      "description": "The responder's port number."
+      "description": "The responder's port number.",
+      "type": "integer"
     },
     "st": {
+      "description": "A set.",
       "type": "array",
       "items": {
         "type": "integer"
-      },
-      "description": "A set."
+      }
     },
     "s": {
-      "type": "string",
-      "description": "A string."
+      "description": "A string.",
+      "type": "string"
     },
     "sub": {
-      "type": "string",
-      "description": "A subnet."
+      "description": "A subnet.",
+      "type": "string"
     },
     "t": {
-      "type": "number",
-      "description": "A timestamp."
+      "description": "A timestamp.",
+      "type": "number"
     },
     "v": {
+      "description": "A vector.",
       "type": "array",
       "items": {
         "type": "integer"
-      },
-      "description": "A vector."
+      }
     },
     "sd": {
-      "type": "string",
       "description": "A default value.",
+      "type": "string",
       "default": "yes"
     },
     "so": {
-      "type": "string",
-      "description": "An optional value."
+      "description": "An optional value.",
+      "type": "string"
     },
     "aa_plaincomment": {
       "type": "string"

@@ -6,11 +6,11 @@
   "type": "object",
   "properties": {
     "t": {
+      "description": "A timestamp.",
       "type": "number",
       "examples": [
         "1737691432.132607"
-      ],
-      "description": "A timestamp."
+      ]
     }
   },
   "required": [

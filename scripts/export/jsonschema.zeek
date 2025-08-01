@@ -245,10 +245,11 @@ function process_log(ex: Log::Schema::Exporter, log: Log::Schema::Log)
 		# property as a table.
 		local prop: JSONTable = table() &ordered;
 
-		property_fill_type(prop, field$_type);
-
 		if ( field?$docstring )
 			prop["description"] = field$docstring;
+
+		property_fill_type(prop, field$_type);
+
 		if ( field?$_default )
 			prop["default"] = field$_default;
 		if ( field?$is_optional && ! field$is_optional )
