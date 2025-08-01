@@ -27,6 +27,7 @@
     },
     "c": {
       "type": "integer",
+      "minimum": 0,
       "description": "A count.",
       "x-zeek": {
         "type": "count",
@@ -82,6 +83,8 @@
     },
     "p": {
       "type": "integer",
+      "minimum": 0,
+      "maximum": 65535,
       "description": "A port.",
       "x-zeek": {
         "type": "port",
@@ -102,6 +105,8 @@
     },
     "r.orig_p": {
       "type": "integer",
+      "minimum": 0,
+      "maximum": 65535,
       "description": "The originator's port number.",
       "x-zeek": {
         "type": "port",
@@ -122,6 +127,8 @@
     },
     "r.resp_p": {
       "type": "integer",
+      "minimum": 0,
+      "maximum": 65535,
       "description": "The responder's port number.",
       "x-zeek": {
         "type": "port",
@@ -133,7 +140,8 @@
     "st": {
       "type": "array",
       "items": {
-        "type": "integer"
+        "type": "integer",
+        "minimum": 0
       },
       "description": "A set.",
       "x-zeek": {
@@ -176,7 +184,8 @@
     "v": {
       "type": "array",
       "items": {
-        "type": "integer"
+        "type": "integer",
+        "minimum": 0
       },
       "description": "A vector.",
       "x-zeek": {

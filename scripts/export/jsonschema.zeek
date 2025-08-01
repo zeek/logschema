@@ -59,6 +59,11 @@ export {
 
 	## Whether to include the x-zeek annotation object in field properties.
 	const add_zeek_annotations = T &redef;
+
+	## Whether to include detailed constraints, such as the fact that
+	## a count cannot be negative. Might not be required for a JSON schema
+	## that's largely descriptive and not used for tight validation.
+	const add_detailed_constraints = T &redef;
 }
 
 # Tuck each log's resulting schema onto the Log record:
@@ -122,10 +127,23 @@ function property_fill_type(prop: JSONTable, typ: string)
 			prop["items"] = helper_table;
 			}
 		}
-	else if ( typ == "count" || typ == "int" )
+	else if ( typ == "count" )
+		{
+		prop["type"] = "integer";
+		if ( add_detailed_constraints )
+			prop["minimum"] = 0;
+		}
+	else if ( typ == "int" )
 		prop["type"] = "integer";
 	else if ( typ == "port" )
+		{
 		prop["type"] ="integer";
+		if ( add_detailed_constraints )
+			{
+			prop["minimum"] = 0;
+			prop["maximum"] = 65535;
+			}
+		}
 	else if ( typ == "double" || typ == "interval" )
 		prop["type"] ="number";
 	else if ( typ == "string" || typ == "addr" || typ == "subnet" || typ == "pattern" )
