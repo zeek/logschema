@@ -77,9 +77,14 @@ export {
 	const time_examples: table[JSON::TimestampFormat] of vector of string = {
 		[JSON::TS_EPOCH] = vector("1737691432.132607"),
 		[JSON::TS_MILLIS] = vector("1737691432132"),
-		[JSON::TS_MILLIS_UNSIGNED] = vector("1737691432132"),
 		[JSON::TS_ISO8601] = vector("2025-01-24T04:03:52.132607Z"),
 	} &redef;
+
+@if ( Version::at_least("8.0") )
+	redef time_examples += {
+		[JSON::TS_MILLIS_UNSIGNED] = vector("1737691432132"),
+	};
+@endif
 }
 
 # Tuck each log's resulting schema onto the Log record:
@@ -185,36 +190,49 @@ function property_fill_type(prop: JSONTable, typ: string)
 		{
 		# This depends on the configured format for JSON timestamps.
 		# XXX we should probably get this reflected in the schema.
-		switch LogAscii::json_timestamps
+		# This doesn't use a switch() because the ifs simplify the
+		# interspersed Zeek version check.
+		if ( LogAscii::json_timestamps == JSON::TS_EPOCH )
 			{
-			case JSON::TS_EPOCH:
-				# This is the default.
-				prop["type"] = "number";
-				if ( add_examples )
-					prop["examples"] = time_examples[LogAscii::json_timestamps];
-				break;
-			case JSON::TS_MILLIS:
-				prop["type"] = "integer";
-				if ( add_examples )
-					prop["examples"] = time_examples[LogAscii::json_timestamps];
-				break;
-			case JSON::TS_MILLIS_UNSIGNED:
-				prop["type"] = "integer";
-				if ( add_detailed_constraints )
-					prop["minimum"] = 0;
-				if ( add_examples )
-					prop["examples"] = time_examples[LogAscii::json_timestamps];
-				break;
-			case JSON::TS_ISO8601:
-				prop["type"] = "string";
-				if ( add_examples )
-					prop["examples"] = time_examples[LogAscii::json_timestamps];
-				break;
-			default:
-				Reporter::warning(fmt("Unexpected JSON timestamp format: %s",
-				    LogAscii::json_timestamps));
-				break;
+			# This is the default.
+			prop["type"] = "number";
+			if ( add_examples )
+				prop["examples"] = time_examples[LogAscii::json_timestamps];
 			}
+
+		if ( LogAscii::json_timestamps == JSON::TS_MILLIS )
+			{
+			prop["type"] = "integer";
+			# This became signed with Zeek 8.
+			if ( add_detailed_constraints && ! Version::at_least("8.0") )
+				prop["minimum"] = 0;
+			if ( add_examples )
+				prop["examples"] = time_examples[LogAscii::json_timestamps];
+			}
+@if ( Version::at_least("8.0") )
+		if ( LogAscii::json_timestamps == JSON::TS_MILLIS_UNSIGNED )
+			{
+			prop["type"] = "integer";
+			if ( add_detailed_constraints )
+				prop["minimum"] = 0;
+			}
+@endif
+		if ( LogAscii::json_timestamps == JSON::TS_ISO8601 )
+			{
+			prop["type"] = "string";
+			if ( add_examples )
+				prop["examples"] = time_examples[LogAscii::json_timestamps];
+			}
+
+		if ( "type" !in prop )
+			{
+			Reporter::warning(fmt("Unexpected JSON timestamp format: %s",
+			    LogAscii::json_timestamps));
+			return;
+			}
+
+		if ( add_examples )
+			prop["examples"] = time_examples[LogAscii::json_timestamps];
 		}
 	else if ( /^enum / in typ )
 		{
