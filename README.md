@@ -155,10 +155,37 @@ Note that Zeek logs written in JSON format are technically
 document. Keep this in mind when validating logs, since the validator might need
 nudging to accept this format.
 
+#### Example
+
+```console
+$ cat zeek-conn-log.schema.json | jq
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Schema for Zeek conn.log",
+  "description": "JSON Schema for Zeek conn.log",
+  "type": "object",
+  "properties": {
+    "ts": {
+      "description": "This is the time of the first packet.",
+      "type": "number",
+      "examples": [
+        "1737691432.132607"
+      ],
+      "x-zeek": {
+        "type": "time",
+        "record_type": "Conn::Info",
+        "is_optional": false,
+        "script": "base/protocols/conn/main.zeek"
+      }
+    },
+...
+}
+```
+
 #### Customization
 
-Redef `Log::Schema::JSONSchema::filename` to control the file output, see below
-for details.
+Redef `Log::Schema::JSONSchema::filename` to control the file output, see
+[below](#configuring-filenames) for details.
 
 To omit the `x-zeek` annotation:
 ```zeek
@@ -203,33 +230,6 @@ redef Log::Schema::JSONSchema::add_examples = F;
 
 You can also adjust the example values, see the exporter source for details.
 
-#### Example
-
-```console
-$ cat zeek-conn-log.schema.json | jq
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Schema for Zeek conn.log",
-  "description": "JSON Schema for Zeek conn.log",
-  "type": "object",
-  "properties": {
-    "ts": {
-      "description": "This is the time of the first packet.",
-      "type": "number",
-      "examples": [
-        "1737691432.132607"
-      ],
-      "x-zeek": {
-        "type": "time",
-        "record_type": "Conn::Info",
-        "is_optional": false,
-        "script": "base/protocols/conn/main.zeek"
-      }
-    },
-...
-}
-```
-
 #### Validation
 
 Using the [Sourcemeta jsonschema CLI](https://github.com/sourcemeta/jsonschema):
@@ -267,10 +267,21 @@ For "complex" columns, such as default values or the docstrings, the formatter
 uses JSON representation of the resulting strings. It escapes `\"` to `""`, but
 leaves escaped newline in place.
 
+#### Example
+
+```console
+$ cat zeek-logschema.csv
+log,field,type,record_type,script,is_optional,default,docstring,package
+analyzer,ts,time,Analyzer::Logging::Info,base/frameworks/analyzer/logging.zeek,false,-,"Timestamp of confirmation or violation.",-
+analyzer,cause,string,Analyzer::Logging::Info,base/frameworks/analyzer/logging.zeek,false,-,"What caused this log entry to be produced. This can\ncurrently be ""violation"" or ""confirmation"".",-
+analyzer,analyzer_kind,string,Analyzer::Logging::Info,base/frameworks/analyzer/logging.zeek,false,-,"The kind of analyzer involved. Currently ""packet"", ""file""\nor ""protocol"".",-
+...
+```
+
 #### Customization
 
-Redef `Log::Schema::CSV::filename` to control the file output, see below
-for details.
+Redef `Log::Schema::CSV::filename` to control the file output, see
+[below](#configuring-filenames) for details.
 
 To disable the header line, use the following:
 
@@ -288,17 +299,6 @@ To change the string used for unset `&optional` fields from the default of "-":
 
 ```zeek
 redef Log::Schema::CSV::separater = "";
-```
-
-#### Example
-
-```console
-$ cat zeek-logschema.csv
-log,field,type,record_type,script,is_optional,default,docstring,package
-analyzer,ts,time,Analyzer::Logging::Info,base/frameworks/analyzer/logging.zeek,false,-,"Timestamp of confirmation or violation.",-
-analyzer,cause,string,Analyzer::Logging::Info,base/frameworks/analyzer/logging.zeek,false,-,"What caused this log entry to be produced. This can\ncurrently be ""violation"" or ""confirmation"".",-
-analyzer,analyzer_kind,string,Analyzer::Logging::Info,base/frameworks/analyzer/logging.zeek,false,-,"The kind of analyzer involved. Currently ""packet"", ""file""\nor ""protocol"".",-
-...
 ```
 
 ### Zeek Log
@@ -354,11 +354,6 @@ fields is in the order they're defined in the corresponding Zeek records.
 When writing individual schema files per log, each file contains the JSON object
 for the respective log.
 
-#### Customization
-
-Redef `Log::Schema::JSON::filename` to control the file output, see below
-for details.
-
 #### Example
 
 ```console
@@ -378,6 +373,11 @@ $ cat zeek-logschema.json | jq
       },
       ...
 ```
+
+#### Customization
+
+Redef `Log::Schema::JSON::filename` to control the file output, see
+[below](#configuring-filenames) for details.
 
 ## Choosing a log filter
 
