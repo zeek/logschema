@@ -35,8 +35,8 @@ $ cat zeek-conn-log.schema.json | jq
   "type": "object",
   "properties": {
     "ts": {
-      "type": "number",
       "description": "This is the time of the first packet.",
+      "type": "number",
       ...
     },
 ...
@@ -160,8 +160,48 @@ nudging to accept this format.
 Redef `Log::Schema::JSONSchema::filename` to control the file output, see below
 for details.
 
-You can omit the `x-zeek` annotation by redef'ing
-`Log::Schema::JSONSchema::add_zeek_annotations` to `F`.
+To omit the `x-zeek` annotation:
+```zeek
+redef Log::Schema::JSONSchema::add_zeek_annotations = F;
+```
+
+By default, the schema includes various constraining keywords on the log fields,
+such as the fact that a valid port number ranges from 0 to 65535:
+
+```jsonc
+"id.orig_p": {
+  "description": "The originator's port number.",
+  "type": "integer",
+  "minimum": 0,
+  "maximum": 65535,
+  //...
+```
+
+To omit these and similar constraints:
+```zeek
+redef Log::Schema::JSONSchema::add_detailed_constraints = F;
+```
+
+By default, the schema also contains example values for types where the
+presentation may not be immediately clear:
+
+```jsonc
+"id.orig_h": {
+  "description": "The originator's IP address.",
+  "type": "string",
+  "examples": [
+    "192.168.0.1",
+    "fe80::208:74ff:feda:6210"
+  ],
+  //...
+```
+
+To omit these and similar examples:
+```zeek
+redef Log::Schema::JSONSchema::add_examples = F;
+```
+
+You can also adjust the example values, see the exporter source for details.
 
 #### Example
 
@@ -174,8 +214,11 @@ $ cat zeek-conn-log.schema.json | jq
   "type": "object",
   "properties": {
     "ts": {
-      "type": "number",
       "description": "This is the time of the first packet.",
+      "type": "number",
+      "examples": [
+        "1737691432.132607"
+      ],
       "x-zeek": {
         "type": "time",
         "record_type": "Conn::Info",
