@@ -174,7 +174,6 @@ $ cat zeek-conn-log.schema.json | jq
       "x-zeek": {
         "type": "time",
         "record_type": "Conn::Info",
-        "is_optional": false,
         "script": "base/protocols/conn/main.zeek"
       }
     },
