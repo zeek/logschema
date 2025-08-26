@@ -466,8 +466,12 @@ A few Zeek logs use `&default` attributes for which this package produces
 different output from run to run in schema formats that capture default values,
 such as CSV. Specifically, the SMB logs have timestamps defaulting to current
 network time, producing different timestamps every time you generate the schema.
-You can adjust this and other troublesome output via the `Log::Schema::adapt()`
-hook mentioned above:
+
+The `Log::Schema::show_defaults` toggle, `T` by default, lets you suppress
+defaults in generated schemas when you set it to `F`. This is the easiest way to
+tame such fields, but affects all of them. You can also operate more surgically,
+adjusting this and other troublesome output via the `Log::Schema::adapt()` hook
+mentioned above:
 
 ```zeek
 hook Log::Schema::adapt(logs: Log::Schema::LogsTable) {

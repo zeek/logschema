@@ -18,7 +18,8 @@ export {
 		## Whether the field is optional. This is itself optional since
 		## it's not available before Zeek 6.
 		is_optional: bool &optional;
-		## Default value of the field, if defined.
+		## Default value of the field, if defined, and defaults aren't
+		## disabled via the show_defaults toggle.
 		_default: any &optional;
 		## If available, the docstring for the field.
 		docstring: string &optional;
@@ -137,6 +138,13 @@ export {
 	## Whether to export automatically at startup. Set this to false and
 	## invoke run_export() at a time of your choosing for custom usage.
 	const run_at_startup = T &redef;
+
+	## Whether to include field &default values in schema information. This
+	## is on by default, but since defaults at times get in the way (for
+	## example when a default value changes with every Zeek invocation and
+	## you'd like to diff schemas), setting this to F causes the package to
+	## omit the values.
+	const show_defaults = T &redef;
 
 	## The log filter to use for determining Zeek's logs, including
 	## included/excluded fields, log extensions, and field name mappings.
@@ -264,7 +272,7 @@ function unfold_field(rtype: string, fieldname: string, fieldinfo: record_field,
 		    $_type = fieldinfo$type_name,
 		    $record_type = rtype);
 
-		if ( fieldinfo?$default_val )
+		if ( show_defaults && fieldinfo?$default_val )
 			field$_default = fieldinfo$default_val;
 
 		local docstring = get_record_field_comments(qualified_fieldname);

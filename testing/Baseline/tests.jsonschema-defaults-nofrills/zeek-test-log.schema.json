@@ -86,8 +86,7 @@
     },
     "sd": {
       "description": "A default value.",
-      "type": "string",
-      "default": "yes"
+      "type": "string"
     },
     "so": {
       "description": "An optional value.",
