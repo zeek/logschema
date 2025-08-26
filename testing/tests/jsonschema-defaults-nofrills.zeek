@@ -11,3 +11,5 @@
 redef Log::Schema::JSONSchema::add_zeek_annotations = F;
 redef Log::Schema::JSONSchema::add_detailed_constraints = F;
 redef Log::Schema::JSONSchema::add_examples = F;
+
+redef Log::Schema::show_defaults = F;
