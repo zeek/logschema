@@ -12,9 +12,6 @@ export {
 		_type: string;
 		## Record type containing this field (e.g. "Conn::Info", "conn_id").
 		record_type: string;
-		## Whether the field is optional. This is itself optional since
-		## it's not available before Zeek 6.
-		is_optional: bool &optional;
 		## Script that defines the field, relative to the scripts folder
 		## (e.g. "base/init-bare.zeek"). This is optional because it's
 		## not available before Zeek 6.0.
@@ -284,8 +281,6 @@ function process_log(ex: Log::Schema::Exporter, log: Log::Schema::Log)
 			{
 			local annos = ZeekAnnotations($_type=field$_type, $record_type=field$record_type);
 
-			if ( field?$is_optional )
-				annos$is_optional = field$is_optional;
 			if ( field?$script )
 				annos$script = field$script;
 			if ( field?$package )

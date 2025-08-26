@@ -15,7 +15,6 @@
       "x-zeek": {
         "type": "addr",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -25,7 +24,6 @@
       "x-zeek": {
         "type": "bool",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -36,7 +34,6 @@
       "x-zeek": {
         "type": "count",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -46,7 +43,6 @@
       "x-zeek": {
         "type": "double",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -61,7 +57,6 @@
       "x-zeek": {
         "type": "enum transport_proto",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -71,7 +66,6 @@
       "x-zeek": {
         "type": "int",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -81,7 +75,6 @@
       "x-zeek": {
         "type": "interval",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -93,7 +86,6 @@
       "x-zeek": {
         "type": "port",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -107,7 +99,6 @@
       "x-zeek": {
         "type": "addr",
         "record_type": "conn_id",
-        "is_optional": false,
         "script": "base/init-bare.zeek"
       }
     },
@@ -119,7 +110,6 @@
       "x-zeek": {
         "type": "port",
         "record_type": "conn_id",
-        "is_optional": false,
         "script": "base/init-bare.zeek"
       }
     },
@@ -133,7 +123,6 @@
       "x-zeek": {
         "type": "addr",
         "record_type": "conn_id",
-        "is_optional": false,
         "script": "base/init-bare.zeek"
       }
     },
@@ -145,7 +134,6 @@
       "x-zeek": {
         "type": "port",
         "record_type": "conn_id",
-        "is_optional": false,
         "script": "base/init-bare.zeek"
       }
     },
@@ -159,7 +147,6 @@
       "x-zeek": {
         "type": "set[count]",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -169,7 +156,6 @@
       "x-zeek": {
         "type": "string",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -183,7 +169,6 @@
       "x-zeek": {
         "type": "subnet",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -196,7 +181,6 @@
       "x-zeek": {
         "type": "time",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -210,7 +194,6 @@
       "x-zeek": {
         "type": "vector of count",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     },
@@ -221,7 +204,6 @@
       "x-zeek": {
         "type": "string",
         "record_type": "Testlog::Info",
-        "is_optional": true,
         "script": "testlog.zeek"
       }
     },
@@ -231,7 +213,6 @@
       "x-zeek": {
         "type": "string",
         "record_type": "Testlog::Info",
-        "is_optional": true,
         "script": "testlog.zeek"
       }
     },
@@ -240,7 +221,6 @@
       "x-zeek": {
         "type": "string",
         "record_type": "Testlog::Info",
-        "is_optional": false,
         "script": "testlog.zeek"
       }
     }
