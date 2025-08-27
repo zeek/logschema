@@ -428,6 +428,39 @@ $ cat zeek-conn-log.schema.json | jq '.properties["service"]'
 Consult the logschema package's [`Field` record](https://github.com/zeek/logschema/blob/main/scripts/main.zeek#L6-L32)
 for details on the available log field metadata.
 
+## Zeek package determination
+
+For each field in the logs, logschema attempts to identify Zeek packages (as
+installed with `zkg`) that contribute it. Since `zkg` does not add package
+metadata to installed scripts, the logschema package uses a heuristic: it
+derives this information from the filename path of the Zeek script that
+contributes a field. Using this path, the package scans the prefixes in
+`Log::Schema::package_prefixes` for matches. Once it finds one, the next
+directory becomes the name of the package. The defaults match Zeek's standard
+installation of packages into the `share/zeek/site/packages` directory.
+
+For example, say you have a Zeek package "foobar" whose main.zeek script adds a
+field to conn.log. `zkg` will typically install the script in
+`share/zeek/site/packages/foobar/main.zeek`. When starting up, Zeek learns that
+`site/packages/foobar/main.zeek` is responsible for the log field. The
+`site/packages` entry in `Log::Schema::package_prefixes` matches this path, and
+logschema sets the field's Zeek package name to "foobar".
+
+You can adjust this behavior in two ways. First, to recognize additional paths,
+adjust the set of prefixes by redefining
+`Log::Schema::package_prefixes`. Second, you can write arbitrary logic in a
+`Log::Schema::adapt` hook handler to assign package names, perhaps as follows:
+
+```zeek
+hook Log::Schema::adapt(logs: Log::Schema::LogsTable) {
+    for ( _, field in logs[MY::LOG]$fields ) {
+        field$package = "mypackage";
+    }
+}
+```
+
+The path-based behavior is only available in Zeek 6 and newer.
+
 ## Writing your own exporter
 
 Writing an exporter involves three steps:
