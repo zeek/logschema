@@ -4,13 +4,12 @@
 # run as usual. This may need to become more fine-grained for older versions in
 # the future.
 
-BTEST="btest -A -d -j -c btest.cfg"
+ALTERNATIVE=
 
 if command -v zeek-config >/dev/null; then
     if zeek-config --version | grep -q '^[12345]\.'; then
-        $BTEST -a oldzeek
-        exit $?
+        ALTERNATIVE="-a oldzeek"
     fi
 fi
 
-$BTEST
+btest $ALTERNATIVE "$@"
