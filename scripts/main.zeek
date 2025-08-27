@@ -152,12 +152,24 @@ export {
 	const logfilter = "default" &redef;
 
 	## The export determines for each log field the absolute path to the
-	## Zeek script that provides it. Use this list to remove common prefixes
+	## Zeek script that provides it. Use this vector to remove common prefixes
 	## from those paths during export. Note that Zeekygen already excludes
-	## the path up to (and including) Zeek's own "scripts/" folder. Also,
+	## the path up to (and including) Zeek's own scripts folder, i.e. up to
+	## and including the "share/zeek/" folder in the install tree. Also,
 	## prefixes listed here apply iteratively (i.e., prefixes "/foo" and
 	## "/bar" applied to "/foo/bar/baz" will yield "/baz").
 	const script_prefixes: vector of string &redef;
+
+	## The export uses each field's contributing Zeek script path to
+	## determine the name of any Zeek package that owns the field. Starting
+	## from the script path after normalization via the script_prefixes
+	## vector, the export prefix-matches the paths in this vector. When one
+	## matches, logschema selects the next directory as the package name.
+	##
+	## For example, if field$script is "site/packages/foobar/main.zeek", it
+	## concludes the package name is "foobar" based on the prefix match of
+	## "site/packages".
+	const package_prefixes: vector of string = vector("site/packages") &redef;
 }
 
 # Add the name of the field a record_field instance describes to itself:
@@ -227,6 +239,32 @@ function get_record_fields(type_name: string, log_only: bool): vector of record_
 	return res;
 	}
 
+# Attempts to populate the given field's package member, based
+# on the script path information available in the field, and the
+# prefix configuration of the package_prefixes vector.
+function set_package_name(field: Field): bool
+	{
+	if ( ! field?$script )
+		return F;
+
+	for ( _, prefix in package_prefixes )
+		{
+		if ( starts_with(field$script, prefix) )
+			{
+			# Cut off the matching prefix ...
+			field$package = field$script[|prefix|:];
+			# ... strip leading slashes if any ...
+			field$package = lstrip(field$package, "/");
+			# ... and cut off any paths that follow.
+			field$package = split_string(field$package, /\//)[0];
+
+			return T;
+			}
+		}
+
+	return F;
+	}
+
 # For the given record type and field in it, return a list of Fields it provides
 # when logged. This will usually be a single field, but if the requested field
 # is itself a record this will recurse and lead to multiple fields.
@@ -286,17 +324,14 @@ function unfold_field(rtype: string, fieldname: string, fieldinfo: record_field,
 		# identified script, do so now:
 		if ( field?$script )
 			{
-			# Take the directory in which a package's scripts reside
-			# to mean the package name:
-			if ( starts_with(field$script, "site/packages/") )
-				field$package = split_string(field$script, /\//)[2];
-
 			for ( _, prefix in script_prefixes )
 				{
 				if ( starts_with(field$script, prefix) )
 					field$script = field$script[|prefix|:];
 				}
 			}
+
+		set_package_name(field);
 
 		fields += field;
 		}

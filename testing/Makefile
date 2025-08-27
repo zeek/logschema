@@ -1,3 +1,3 @@
 
 test:
-	@btest -c btest.cfg
+	./btest.sh -A -d -j -c btest.cfg

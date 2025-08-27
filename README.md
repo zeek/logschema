@@ -65,7 +65,7 @@ analyzer,analyzer_kind,string,Analyzer::Logging::Info,base/frameworks/analyzer/l
 Zeek features a powerful [logging
 framework](https://docs.zeek.org/en/master/frameworks/logging.html) that manages
 Zeek's log streams, log writes, and their eventual output format. The format of
-Zeek's log entries is highly site-dependent and depends on the configuration of
+Zeek's log entries is highly site-specific and depends on the configuration of
 log filters, enrichments that add additional fields to existing logs, new logs
 produced by add-on protocol parsers, etc.
 
@@ -130,10 +130,10 @@ the exporter writes one schema file per log, named
 `zeek-{logname}-log.schema.json`. Each log field becomes a property in the
 schema. The schemas feature the type of each field when rendered in JSON, a
 description (from Zeek's docstrings), default values, and whether a field is
-required. They currently do not annotate or enforce formats (e.g. to convey that
-an address string is formatted as an IP address), and they don't yet apply all
-conceivable constraints (such as the integer range of a port number). The
-schemas also don't currently prohibit `additionalProperties`.
+required. They do not annotate or enforce formats (e.g. to convey that an
+address string is formatted as an IP address), and they don't apply all
+conceivable constraints. The schemas also don't prohibit
+`additionalProperties`. In short, they're somewhat "loose".
 
 Zeek knows more about its log schema than what JSON Schema's expressiveness can
 capture naturally. For example, there's no immediate "vocabulary" in JSON Schema
@@ -143,15 +143,15 @@ package added it. To convey these properties, the package adds an `x-zeek`
 to each field's property. Schema validators and other JSON Schema-centric
 applications safely ignore such annotations. The annotation is
 [an object](https://github.com/zeek/logschema/blob/main/scripts/export/jsonschema.zeek#L6-L25)
-including the Zeek type, the record type containing the field, whether the field
-is optional, the script that defined the field, and the package that added the
+including the Zeek type, the record type containing the field, the script
+that defined the field, and the package that added the
 field, if applicable. (See [Schema information](#schema-information) above for
 details.)
 
 Each log's schema is self-contained.
 
 Note that Zeek logs written in JSON format are technically
-[JSONL](https://jsonlines.org/) documents, i.e., every line in a log is a JSON
+[JSONL](https://jsonlines.org/) documents, i.e., every log line is a JSON
 document. Keep this in mind when validating logs, since the validator might need
 nudging to accept this format.
 
@@ -428,6 +428,39 @@ $ cat zeek-conn-log.schema.json | jq '.properties["service"]'
 Consult the logschema package's [`Field` record](https://github.com/zeek/logschema/blob/main/scripts/main.zeek#L6-L32)
 for details on the available log field metadata.
 
+## Zeek package determination
+
+For each field in the logs, logschema attempts to identify Zeek packages (as
+installed with `zkg`) that contribute it. Since `zkg` does not add package
+metadata to installed scripts, the logschema package uses a heuristic: it
+derives this information from the filename path of the Zeek script that
+contributes a field. Using this path, the package scans the prefixes in
+`Log::Schema::package_prefixes` for matches. Once it finds one, the next
+directory becomes the name of the package. The defaults match Zeek's standard
+installation of packages into the `share/zeek/site/packages` directory.
+
+For example, say you have a Zeek package "foobar" whose main.zeek script adds a
+field to conn.log. `zkg` will typically install the script in
+`share/zeek/site/packages/foobar/main.zeek`. When starting up, Zeek learns that
+`site/packages/foobar/main.zeek` is responsible for the log field. The
+`site/packages` entry in `Log::Schema::package_prefixes` matches this path, and
+logschema sets the field's Zeek package name to "foobar".
+
+You can adjust this behavior in two ways. First, to recognize additional paths,
+adjust the set of prefixes by redefining
+`Log::Schema::package_prefixes`. Second, you can write arbitrary logic in a
+`Log::Schema::adapt` hook handler to assign package names, perhaps as follows:
+
+```zeek
+hook Log::Schema::adapt(logs: Log::Schema::LogsTable) {
+    for ( _, field in logs[MY::LOG]$fields ) {
+        field$package = "mypackage";
+    }
+}
+```
+
+The path-based behavior is only available in Zeek 6 and newer.
+
 ## Writing your own exporter
 
 Writing an exporter involves three steps:
@@ -464,8 +497,8 @@ suggest the use of custom `Log::Schema::run_export()` invocations in that case.
 
 A few Zeek logs use `&default` attributes for which this package produces
 different output from run to run in schema formats that capture default values,
-such as CSV. Specifically, the SMB logs have timestamps defaulting to current
-network time, producing different timestamps every time you generate the schema.
+such as CSV. For example, the SMB logs have timestamps defaulting to current
+network time, producing different timestamps whenever you generate the schemas.
 
 The `Log::Schema::show_defaults` toggle, `T` by default, lets you suppress
 defaults in generated schemas when you set it to `F`. This is the easiest way to
@@ -480,8 +513,7 @@ hook Log::Schema::adapt(logs: Log::Schema::LogsTable) {
 }
 ```
 
-(You can also suppress this particular churn by redef'ing
+You can also suppress this particular churn by redef'ing
 `allow_network_time_forward=F`, which will keep these timestamps at 0.0 when
-producing the schema at startup. You will probably not want to use this approach
-if you're running Zeek in production while producing schemas, since it affects
-Zeek's internal handling of time.)
+producing the schema at startup. You likely don't want to use this approach when
+running Zeek in production, since it affects Zeek's internal handling of time.
