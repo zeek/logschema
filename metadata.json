@@ -1,0 +1,30 @@
+{
+  "name": "Logschema",
+  "summary": "Enables logschema package to obtain schemas for Zeek logs.",
+  "desc": "Enables Zeek logschemas",
+  "unique_name": "bro.pkgs.corelight.logschema",
+  "key": "bro.pkgs.corelight.logschema.loaded",
+  "sensor_core": {
+    "load": "CorelightPackages::logschema_enable"
+  },
+  "version": "2.0.0-corelight+1",
+  "zeek_version": "5.2.0",
+  "label": {
+    "code_train": [
+      "release"
+    ],
+    "collection": [
+      "Core"
+    ],
+    "deployment": [
+      "E/W",
+      "N/S"
+    ]
+  },
+  "user_visible": false,
+  "automatically_enable": false,
+  "change_notes": "",
+  "configurations": [],
+  "input": [],
+  "log_paths_created": []
+}
