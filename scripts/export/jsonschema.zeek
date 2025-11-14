@@ -302,13 +302,13 @@ function write_all_schemas(hdl: file, ex: Log::Schema::Exporter, logs: Log::Sche
 	{
 	for ( _, log in logs )
 		{
-		write_file(hdl, to_json(log$jsonschema_export$schema));
+		write_file(hdl, to_json(log$jsonschema_export$schema) + "\n");
 		}
 	}
 
 function write_single_schema(hdl: file, ex: Log::Schema::Exporter, log: Log::Schema::Log)
 	{
-	write_file(hdl, to_json(log$jsonschema_export$schema));
+	write_file(hdl, to_json(log$jsonschema_export$schema) + "\n");
 	}
 
 event zeek_init()
