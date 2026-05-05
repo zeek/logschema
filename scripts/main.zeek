@@ -115,6 +115,11 @@ export {
 	## filter completes, and prior to the exporters' processing.
 	global adapt: hook(logs: LogsTable);
 
+	## A helper function that computes a fully populated LogsTable, with log
+	## streams in case-insensitive alphabetical order by Log::ID enum
+	## values.
+	global make_logs_table: function(): LogsTable;
+
 	## This produces a filename from the given format string and additional
 	## context. Supported substitutions in format:
 	##
@@ -453,14 +458,12 @@ function add_exporter(ex: Exporter)
 	exporters += ex;
 	}
 
-function run_export()
+function make_logs_table(): LogsTable
 	{
 	local logs: LogsTable;
-	local log: Log;
-	local id_map: table[string] of Log::ID;
 	local ids: vector of string;
 	local id: Log::ID;
-	local hdl: file;
+	local id_map: table[string] of Log::ID;
 
 	# Ensure we process the log streams in alphabetical order based on their
 	# Log::ID enum vals, case-insensitively -- this isolates us from changes
@@ -481,6 +484,16 @@ function run_export()
 		id = id_map[idname];
 		logs[id] = analyze_stream(id);
 		}
+
+	return logs;
+	}
+
+function run_export()
+	{
+	local logs = make_logs_table();
+	local log: Log;
+	local hdl: file;
+	local ex: Exporter;
 
 	hook adapt(logs);
 
