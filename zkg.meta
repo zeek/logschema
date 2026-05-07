@@ -1,7 +1,6 @@
 [package]
 script_dir = scripts
 test_command = cd testing && ./btest.sh
-summary = Log data schema generation
 description = This package generates schemas for Zeek's logs.
     For every log your Zeek installation produces, the schema describes each log
     field including name, type, docstring, and more. The package supports JSON Schema,
