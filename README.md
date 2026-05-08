@@ -60,6 +60,14 @@ analyzer,analyzer_kind,string,Analyzer::Logging::Info,base/frameworks/analyzer/l
 ...
 ```
 
+To see quickly whether your log schema has changed, the package supports schema
+fingerprinting. Run the following with any applicable customizations:
+
+```console
+$ zeek logschema/fingerprint [...]
+ksgNUWP/+AOl0HVEvWMk
+```
+
 ## Background
 
 Zeek features a powerful [logging
@@ -116,6 +124,58 @@ fields, etc.
 At this point, each schema exporter decides how to use the resulting field
 metadata. Not all schema formats support all of this information -- for example,
 a schema language may have no concept of the Zeek package providing a log field.
+
+## Schema fingerprints
+
+The package supports fingerprinting the effective log schema of a given Zeek
+installation. This fingerprint is a short, printable string that reflects the
+names of the logs, their field names, the sequence of the fields, and the Zeek
+type of each field. If two fingerprints match, the Zeek versions/configurations
+involved produce the same set of logs. If they differ, they produce different
+sets of logs, the logs consist of different fields, or both. To understand such
+differences in detail, use the logschema package to produce full schemas
+suitable for diffing (such as [CSV](#CSV)), and examine the differences.
+
+To produce a fingerprint at the command line, run the following, including any
+customizations and site-specific loads that apply:
+
+```console
+$ zeek logschema/fingerprint [...]
+ksgNUWP/+AOl0HVEvWMk
+```
+
+For example, the following confirms that Zeek's default set of logs did not
+change schemas between Zeek 8.1 and 8.2:
+
+```console
+$ docker run -it --rm zeek/zeek:8.1
+root@4b7a9853446c:/# zkg install --force logschema
+Running unit tests for "zeek/zeek/logschema"
+Installing "zeek/zeek/logschema"
+Installed "zeek/zeek/logschema" (v2.1.0)
+Loaded "zeek/zeek/logschema"
+root@4b7a9853446c:/# zeek logschema/fingerprint
+wmtjsfEuiBqAFbqGRibm
+root@4b7a9853446c:/# <ctrl-d>
+
+$ docker run -it --rm zeek/zeek:8.2.0-rc1
+root@96f4fbf1ab1c:/# zkg install --force logschema
+Running unit tests for "zeek/zeek/logschema"
+Installing "zeek/zeek/logschema"
+Installed "zeek/zeek/logschema" (v2.1.0)
+Loaded "zeek/zeek/logschema"
+root@96f4fbf1ab1c:/# zeek logschema/fingerprint
+wmtjsfEuiBqAFbqGRibm
+```
+However, the fingerprint changes if you add a script that modifies the logs
+-- here, an extra field in conn.log:
+```console
+root@96f4fbf1ab1c:/# zeek logschema/fingerprint protocols/conn/community-id-logging
+f1rqCNgyDVhCOds4ZTLr
+```
+
+To produce the fingerprint in your own scripting, take a look at the
+`Log::Schema::fingerprint()` function.
 
 ## Supported schema formats
 

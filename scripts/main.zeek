@@ -115,6 +115,28 @@ export {
 	## filter completes, and prior to the exporters' processing.
 	global adapt: hook(logs: LogsTable);
 
+	## This function returns a short printable "fingerprint" string that
+	## identifies the log schema as per the LogsTable provided. If you
+	## don't provide such a table, it'll default to the effective schema
+	## at invocation time (as per make_logs_table()).
+	##
+	## If two fingerprints match, the Zeek versions/configurations involved
+	## produce the same set of logs -- specifically, logs with the same
+	## names, field names, sequence of fields, and field types. As when
+	## generating schemas, the fingerprint is based on the log filter
+	## identified by the Log::Schema::logfilter setting, normally
+	## "default". The fingerprint does not include any other properties,
+	## such as field default values or docstrings.
+	##
+	## To use this function from the command-line, consider the
+	## fingerprint.zeek script included in this package.
+	global fingerprint: function(logs: LogsTable &default=table()): string;
+
+	## A helper function that computes a fully populated LogsTable, with log
+	## streams in case-insensitive alphabetical order by Log::ID enum
+	## values.
+	global make_logs_table: function(): LogsTable;
+
 	## This produces a filename from the given format string and additional
 	## context. Supported substitutions in format:
 	##
@@ -453,14 +475,39 @@ function add_exporter(ex: Exporter)
 	exporters += ex;
 	}
 
-function run_export()
+function fingerprint(logs: LogsTable): string
+	{
+	if ( |logs| == 0 )
+		logs = make_logs_table();
+
+	# The fingerprint factors in the names of the logs, the names of fields,
+	# and their types, all ordered. Use SHA-256 on the sequence of strings,
+	# truncated in ~half, and compressed down via base64 in the end. 30
+	# characters instead of, say, 32, make for cleaner base64 tail ends, and
+	# SHA-256 over SHA-1 or MD5 is mainly to ensure long-term availability.
+
+	local hash = sha256_hash_init();
+
+	for ( _, log in logs )
+		{
+		sha256_hash_update(hash, log$name);
+
+		for ( name, field in log$fields )
+			{
+			sha256_hash_update(hash, name);
+			sha256_hash_update(hash, field$_type);
+			}
+		}
+
+	return encode_base64(hexstr_to_bytestring(sha256_hash_finish(hash)[:30]));
+	}
+
+function make_logs_table(): LogsTable
 	{
 	local logs: LogsTable;
-	local log: Log;
-	local id_map: table[string] of Log::ID;
 	local ids: vector of string;
 	local id: Log::ID;
-	local hdl: file;
+	local id_map: table[string] of Log::ID;
 
 	# Ensure we process the log streams in alphabetical order based on their
 	# Log::ID enum vals, case-insensitively -- this isolates us from changes
@@ -481,6 +528,16 @@ function run_export()
 		id = id_map[idname];
 		logs[id] = analyze_stream(id);
 		}
+
+	return logs;
+	}
+
+function run_export()
+	{
+	local logs = make_logs_table();
+	local log: Log;
+	local hdl: file;
+	local ex: Exporter;
 
 	hook adapt(logs);
 
