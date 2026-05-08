@@ -12,4 +12,4 @@ if command -v zeek-config >/dev/null; then
     fi
 fi
 
-btest $ALTERNATIVE "$@"
+btest -j $ALTERNATIVE "$@"
