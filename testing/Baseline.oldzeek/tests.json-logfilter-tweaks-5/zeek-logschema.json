@@ -5,10 +5,10 @@
     "id": "Testlog::LOG",
     "fields": [
       {
-        "name": "r_orig_h",
+        "name": "r_h",
         "type": "addr",
-        "record_type": "conn_id",
-        "docstring": "The originator's IP address."
+        "record_type": "Testlog::Rec",
+        "docstring": "The IP address."
       }
     ]
   }

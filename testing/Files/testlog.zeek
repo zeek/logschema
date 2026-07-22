@@ -5,6 +5,12 @@ module Testlog;
 export {
 	redef enum Log::ID += { LOG };
 
+	# A helper record for testing &log / &optional propagation
+	type Rec: record {
+		h: addr &log;	##< The IP address.
+		p: port &log;	##< The port number.
+	};
+
 	# A record we'd use for logging, with a bunch of types.
 	type Info: record {
 		## An address. Also a comment with "quotation marks",
@@ -33,7 +39,10 @@ export {
 		p: port &log;
 
 		## A record.
-		r: conn_id &log;
+		r: Rec &log;
+
+		## An optional record.
+		ro: Rec &optional &log;
 
 		## A set.
 		st: set[count] &log;

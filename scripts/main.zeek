@@ -218,6 +218,19 @@ function field_set_optional(f: Field, fieldinfo: record_field)
 @endif
 	}
 
+# Compatibility wrapper for older Zeeks: returns whether the given field is
+# itself declared &optional. Before Zeek 6 the record_field record had no
+# "optional" member, so we can't tell and conservatively return F (unchanged
+# from prior behavior, where optionality was simply unknown).
+function field_is_optional(fieldinfo: record_field): bool
+	{
+@if ( Version::at_least("6.0") )
+	return fieldinfo$optional;
+@else
+	return F;
+@endif
+	}
+
 # Compatibility wrapper for older Zeeks
 function field_set_script(f: Field, qualified_fieldname: string)
 	{
@@ -300,8 +313,13 @@ function set_package_name(field: Field): bool
 #
 # filter: the log filter we're using to determine the logging setup.
 #
+# parent_optional: whether an ancestor record field leading to this one was
+#            declared &optional. When true, the unfolded leaf fields are
+#            themselves effectively optional, since the whole sub-record may be
+#            absent (e.g. an &optional "id: conn_id" makes "id.orig_h" optional).
+#
 function unfold_field(rtype: string, fieldname: string, fieldinfo: record_field,
-    filter: Log::Filter): vector of Field
+    filter: Log::Filter, parent_optional: bool &default=F): vector of Field
 	{
 	local fields: vector of Field;
 
@@ -313,13 +331,19 @@ function unfold_field(rtype: string, fieldname: string, fieldinfo: record_field,
 		{
 		local record_type_name = fieldinfo$type_name[7:];
 
+		# Carry the optionality of this record field into its sub-fields:
+		# if this record (or an ancestor) is &optional, everything unfolded
+		# from it is optional too.
+		local sub_optional = parent_optional || field_is_optional(fieldinfo);
+
 		for ( _, rfield in get_record_fields(record_type_name) )
 			{
 			fields += unfold_field(
 			    record_type_name,
 			    cat(fieldname, filter$scope_sep, rfield$name),
 			    rfield,
-			    filter);
+			    filter,
+			    sub_optional);
 			}
 		}
 	else
@@ -340,6 +364,13 @@ function unfold_field(rtype: string, fieldname: string, fieldinfo: record_field,
 			field$docstring = docstring;
 
 		field_set_optional(field, fieldinfo);
+
+		# An optional ancestor record makes this leaf optional regardless of
+		# the leaf's own declaration. Guarded on is_optional being populated,
+		# which matches field_set_optional (only set on Zeek >= 6).
+		if ( parent_optional && field?$is_optional )
+			field$is_optional = T;
+
 		field_set_script(field, qualified_fieldname);
 
 		# If there are additional path prefixes to remove from the

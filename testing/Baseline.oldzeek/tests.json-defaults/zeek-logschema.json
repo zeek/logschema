@@ -53,28 +53,28 @@
         "docstring": "A port."
       },
       {
-        "name": "r.orig_h",
+        "name": "r.h",
         "type": "addr",
-        "record_type": "conn_id",
-        "docstring": "The originator's IP address."
+        "record_type": "Testlog::Rec",
+        "docstring": "The IP address."
       },
       {
-        "name": "r.orig_p",
+        "name": "r.p",
         "type": "port",
-        "record_type": "conn_id",
-        "docstring": "The originator's port number."
+        "record_type": "Testlog::Rec",
+        "docstring": "The port number."
       },
       {
-        "name": "r.resp_h",
+        "name": "ro.h",
         "type": "addr",
-        "record_type": "conn_id",
-        "docstring": "The responder's IP address."
+        "record_type": "Testlog::Rec",
+        "docstring": "The IP address."
       },
       {
-        "name": "r.resp_p",
+        "name": "ro.p",
         "type": "port",
-        "record_type": "conn_id",
-        "docstring": "The responder's port number."
+        "record_type": "Testlog::Rec",
+        "docstring": "The port number."
       },
       {
         "name": "st",

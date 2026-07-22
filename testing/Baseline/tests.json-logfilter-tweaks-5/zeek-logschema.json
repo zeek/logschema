@@ -5,12 +5,12 @@
     "id": "Testlog::LOG",
     "fields": [
       {
-        "name": "r_orig_h",
+        "name": "r_h",
         "type": "addr",
-        "record_type": "conn_id",
+        "record_type": "Testlog::Rec",
         "is_optional": false,
-        "docstring": "The originator's IP address.",
-        "script": "base/init-bare.zeek"
+        "docstring": "The IP address.",
+        "script": "testlog.zeek"
       }
     ]
   }
