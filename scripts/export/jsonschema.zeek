@@ -117,10 +117,12 @@ function container_element_type(typ: string): string
 
 	if ( /^vector / in typ )
 		{
-		parts = split_string(typ, / +/);
-		if ( |parts| < 3 )
+		# Need to account here for the possibility of the contained type
+		# being multiple words, e.g. "vector of enum Foo::Bar".
+		parts = split_string1(typ, / +of +/);
+		if ( |parts| < 2 )
 			return "";
-		return parts[2];
+		return parts[1];
 		}
 
 	return "";
