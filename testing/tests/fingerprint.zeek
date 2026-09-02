@@ -67,6 +67,7 @@ event zeek_init() &priority=-10
 # @TEST-START-NEXT
 # A two-field log that we're about to fingerprint again below, with swapped fields.
 
+@load ./common
 @load logschema/fingerprint
 
 module Testlog;
@@ -91,6 +92,7 @@ event zeek_init() &priority=-10
 # @TEST-START-NEXT
 # The two-field log with swapped fields: that should matter.
 
+@load ./common
 @load logschema/fingerprint
 
 module Testlog;
@@ -115,6 +117,7 @@ event zeek_init() &priority=-10
 # @TEST-START-NEXT
 # The two-field log with swapped field names but not types: should matter too.
 
+@load ./common
 @load logschema/fingerprint
 
 module Testlog;
