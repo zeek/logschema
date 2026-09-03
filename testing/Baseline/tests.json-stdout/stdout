@@ -83,36 +83,36 @@
         "script": "testlog.zeek"
       },
       {
-        "name": "r.orig_h",
+        "name": "r.h",
         "type": "addr",
-        "record_type": "conn_id",
+        "record_type": "Testlog::Rec",
         "is_optional": false,
-        "docstring": "The originator's IP address.",
-        "script": "base/init-bare.zeek"
+        "docstring": "The IP address.",
+        "script": "testlog.zeek"
       },
       {
-        "name": "r.orig_p",
+        "name": "r.p",
         "type": "port",
-        "record_type": "conn_id",
+        "record_type": "Testlog::Rec",
         "is_optional": false,
-        "docstring": "The originator's port number.",
-        "script": "base/init-bare.zeek"
+        "docstring": "The port number.",
+        "script": "testlog.zeek"
       },
       {
-        "name": "r.resp_h",
+        "name": "ro.h",
         "type": "addr",
-        "record_type": "conn_id",
-        "is_optional": false,
-        "docstring": "The responder's IP address.",
-        "script": "base/init-bare.zeek"
+        "record_type": "Testlog::Rec",
+        "is_optional": true,
+        "docstring": "The IP address.",
+        "script": "testlog.zeek"
       },
       {
-        "name": "r.resp_p",
+        "name": "ro.p",
         "type": "port",
-        "record_type": "conn_id",
-        "is_optional": false,
-        "docstring": "The responder's port number.",
-        "script": "base/init-bare.zeek"
+        "record_type": "Testlog::Rec",
+        "is_optional": true,
+        "docstring": "The port number.",
+        "script": "testlog.zeek"
       },
       {
         "name": "st",

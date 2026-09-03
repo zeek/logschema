@@ -7,10 +7,10 @@ test,e,enum transport_proto,Testlog::Info,-,-,"An enum.",-,-
 test,i,int,Testlog::Info,-,-,"An integer.",-,-
 test,ival,interval,Testlog::Info,-,-,"An interval.",-,-
 test,p,port,Testlog::Info,-,-,"A port.",-,-
-test,r.orig_h,addr,conn_id,-,-,"The originator's IP address.",-,-
-test,r.orig_p,port,conn_id,-,-,"The originator's port number.",-,-
-test,r.resp_h,addr,conn_id,-,-,"The responder's IP address.",-,-
-test,r.resp_p,port,conn_id,-,-,"The responder's port number.",-,-
+test,r.h,addr,Testlog::Rec,-,-,"The IP address.",-,-
+test,r.p,port,Testlog::Rec,-,-,"The port number.",-,-
+test,ro.h,addr,Testlog::Rec,-,-,"The IP address.",-,-
+test,ro.p,port,Testlog::Rec,-,-,"The port number.",-,-
 test,st,set[count],Testlog::Info,-,-,"A set.",-,-
 test,s,string,Testlog::Info,-,-,"A string.",-,-
 test,sub,subnet,Testlog::Info,-,-,"A subnet.",-,-

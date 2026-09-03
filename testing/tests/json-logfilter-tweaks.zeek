@@ -94,6 +94,6 @@ event zeek_init()
 	{
 	Log::add_filter(Testlog::LOG, Log::Filter(
 	    $name = "custom",
-	    $include = set("r_orig_h"),
+	    $include = set("r_h"),
 	));
 	}

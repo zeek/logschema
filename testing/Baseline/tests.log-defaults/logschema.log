@@ -16,10 +16,10 @@
 {"log":"test","field":"i","_type":"int","record_type":"Testlog::Info","is_optional":false,"docstring":"An integer.","script":"testlog.zeek"}
 {"log":"test","field":"ival","_type":"interval","record_type":"Testlog::Info","is_optional":false,"docstring":"An interval.","script":"testlog.zeek"}
 {"log":"test","field":"p","_type":"port","record_type":"Testlog::Info","is_optional":false,"docstring":"A port.","script":"testlog.zeek"}
-{"log":"test","field":"r.orig_h","_type":"addr","record_type":"conn_id","is_optional":false,"docstring":"The originator's IP address.","script":"base/init-bare.zeek"}
-{"log":"test","field":"r.orig_p","_type":"port","record_type":"conn_id","is_optional":false,"docstring":"The originator's port number.","script":"base/init-bare.zeek"}
-{"log":"test","field":"r.resp_h","_type":"addr","record_type":"conn_id","is_optional":false,"docstring":"The responder's IP address.","script":"base/init-bare.zeek"}
-{"log":"test","field":"r.resp_p","_type":"port","record_type":"conn_id","is_optional":false,"docstring":"The responder's port number.","script":"base/init-bare.zeek"}
+{"log":"test","field":"r.h","_type":"addr","record_type":"Testlog::Rec","is_optional":false,"docstring":"The IP address.","script":"testlog.zeek"}
+{"log":"test","field":"r.p","_type":"port","record_type":"Testlog::Rec","is_optional":false,"docstring":"The port number.","script":"testlog.zeek"}
+{"log":"test","field":"ro.h","_type":"addr","record_type":"Testlog::Rec","is_optional":true,"docstring":"The IP address.","script":"testlog.zeek"}
+{"log":"test","field":"ro.p","_type":"port","record_type":"Testlog::Rec","is_optional":true,"docstring":"The port number.","script":"testlog.zeek"}
 {"log":"test","field":"st","_type":"set[count]","record_type":"Testlog::Info","is_optional":false,"docstring":"A set.","script":"testlog.zeek"}
 {"log":"test","field":"s","_type":"string","record_type":"Testlog::Info","is_optional":false,"docstring":"A string.","script":"testlog.zeek"}
 {"log":"test","field":"sub","_type":"subnet","record_type":"Testlog::Info","is_optional":false,"docstring":"A subnet.","script":"testlog.zeek"}

@@ -89,8 +89,8 @@
         "script": "testlog.zeek"
       }
     },
-    "r.orig_h": {
-      "description": "The originator's IP address.",
+    "r.h": {
+      "description": "The IP address.",
       "type": "string",
       "examples": [
         "192.168.0.1",
@@ -98,23 +98,23 @@
       ],
       "x-zeek": {
         "type": "addr",
-        "record_type": "conn_id",
-        "script": "base/init-bare.zeek"
+        "record_type": "Testlog::Rec",
+        "script": "testlog.zeek"
       }
     },
-    "r.orig_p": {
-      "description": "The originator's port number.",
+    "r.p": {
+      "description": "The port number.",
       "type": "integer",
       "minimum": 0,
       "maximum": 65535,
       "x-zeek": {
         "type": "port",
-        "record_type": "conn_id",
-        "script": "base/init-bare.zeek"
+        "record_type": "Testlog::Rec",
+        "script": "testlog.zeek"
       }
     },
-    "r.resp_h": {
-      "description": "The responder's IP address.",
+    "ro.h": {
+      "description": "The IP address.",
       "type": "string",
       "examples": [
         "192.168.0.1",
@@ -122,19 +122,19 @@
       ],
       "x-zeek": {
         "type": "addr",
-        "record_type": "conn_id",
-        "script": "base/init-bare.zeek"
+        "record_type": "Testlog::Rec",
+        "script": "testlog.zeek"
       }
     },
-    "r.resp_p": {
-      "description": "The responder's port number.",
+    "ro.p": {
+      "description": "The port number.",
       "type": "integer",
       "minimum": 0,
       "maximum": 65535,
       "x-zeek": {
         "type": "port",
-        "record_type": "conn_id",
-        "script": "base/init-bare.zeek"
+        "record_type": "Testlog::Rec",
+        "script": "testlog.zeek"
       }
     },
     "st": {
@@ -234,10 +234,8 @@
     "i",
     "ival",
     "p",
-    "r.orig_h",
-    "r.orig_p",
-    "r.resp_h",
-    "r.resp_p",
+    "r.h",
+    "r.p",
     "st",
     "s",
     "sub",

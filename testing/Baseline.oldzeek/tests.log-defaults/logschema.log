@@ -16,10 +16,10 @@
 {"log":"test","field":"i","_type":"int","record_type":"Testlog::Info","docstring":"An integer."}
 {"log":"test","field":"ival","_type":"interval","record_type":"Testlog::Info","docstring":"An interval."}
 {"log":"test","field":"p","_type":"port","record_type":"Testlog::Info","docstring":"A port."}
-{"log":"test","field":"r.orig_h","_type":"addr","record_type":"conn_id","docstring":"The originator's IP address."}
-{"log":"test","field":"r.orig_p","_type":"port","record_type":"conn_id","docstring":"The originator's port number."}
-{"log":"test","field":"r.resp_h","_type":"addr","record_type":"conn_id","docstring":"The responder's IP address."}
-{"log":"test","field":"r.resp_p","_type":"port","record_type":"conn_id","docstring":"The responder's port number."}
+{"log":"test","field":"r.h","_type":"addr","record_type":"Testlog::Rec","docstring":"The IP address."}
+{"log":"test","field":"r.p","_type":"port","record_type":"Testlog::Rec","docstring":"The port number."}
+{"log":"test","field":"ro.h","_type":"addr","record_type":"Testlog::Rec","docstring":"The IP address."}
+{"log":"test","field":"ro.p","_type":"port","record_type":"Testlog::Rec","docstring":"The port number."}
 {"log":"test","field":"st","_type":"set[count]","record_type":"Testlog::Info","docstring":"A set."}
 {"log":"test","field":"s","_type":"string","record_type":"Testlog::Info","docstring":"A string."}
 {"log":"test","field":"sub","_type":"subnet","record_type":"Testlog::Info","docstring":"A subnet."}
